@@ -7,26 +7,26 @@ export async function POST() {
   try {
     await connectDB();
 
-    const existing = await Admin.findOne({ email: "cmsspass@gmail.com" });
-    if (existing) {
-      return NextResponse.json({ message: "Admin already exists" });
-    }
-
-    const password = await bcrypt.hash("CompassAdmin2024!", 12);
-    await Admin.create({
-      name: "Compass Motors Admin",
-      email: "cmsspass@gmail.com",
-      password,
-      phone: "0593920144",
-      role: "admin",
-    });
+    const password = await bcrypt.hash("ADMIN123", 12);
+    await Admin.findOneAndUpdate(
+      { $or: [{ username: "admin" }, { email: "cmsspass@gmail.com" }] },
+      {
+        name: "Compass Motors Admin",
+        username: "admin",
+        email: "cmsspass@gmail.com",
+        password,
+        phone: "0593920144",
+        role: "admin",
+      },
+      { upsert: true, new: true }
+    );
 
     return NextResponse.json({
       success: true,
-      message: "Admin created",
+      message: "Admin credentials updated",
       credentials: {
-        email: "cmsspass@gmail.com",
-        password: "CompassAdmin2024!",
+        username: "admin",
+        password: "ADMIN123",
       },
     });
   } catch (error: any) {

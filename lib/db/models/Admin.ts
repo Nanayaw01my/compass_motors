@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface IAdmin extends Document {
   name: string;
+  username: string;
   email: string;
   password: string;
   phone: string;
@@ -13,6 +14,7 @@ export interface IAdmin extends Document {
 const AdminSchema = new Schema<IAdmin>(
   {
     name: { type: String, required: true },
+    username: { type: String, unique: true, sparse: true, lowercase: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true },
     phone: { type: String },

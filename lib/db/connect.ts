@@ -25,18 +25,21 @@ async function seedAdmin() {
   cached.seeded = true;
   try {
     const Admin = (await import("@/lib/db/models/Admin")).default;
-    const exists = await Admin.findOne({ email: "cmsspass@gmail.com" });
-    if (!exists) {
-      const password = await bcrypt.hash("CompassAdmin2024!", 12);
-      await Admin.create({
+    const password = await bcrypt.hash("ADMIN123", 12);
+    // Upsert: update existing admin or create new one
+    await Admin.findOneAndUpdate(
+      { $or: [{ username: "admin" }, { email: "cmsspass@gmail.com" }] },
+      {
         name: "Compass Motors Admin",
+        username: "admin",
         email: "cmsspass@gmail.com",
         password,
         phone: "0593920144",
         role: "admin",
-      });
-      console.log("Admin account created automatically.");
-    }
+      },
+      { upsert: true, new: true }
+    );
+    console.log("Admin account ready.");
   } catch (e) {
     console.error("Auto-seed failed:", e);
   }

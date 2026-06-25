@@ -27,8 +27,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const username = credentials.username as string;
         const password = credentials.password as string;
 
-        // Try admin first (email format)
-        const admin = await Admin.findOne({ email: username.toLowerCase() });
+        // Try admin by username or email (case insensitive)
+        const admin = await Admin.findOne({
+          $or: [
+            { username: username.toLowerCase() },
+            { email: username.toLowerCase() },
+          ],
+        });
         if (admin) {
           const isValid = await bcrypt.compare(password, admin.password);
           if (!isValid) return null;
