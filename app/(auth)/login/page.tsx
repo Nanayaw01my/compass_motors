@@ -23,10 +23,10 @@ export default function LoginPage() {
     if (result?.error) {
       setError(
         result.error === "Account suspended"
-          ? "Your account has been suspended. Please contact Compass Motors."
+          ? "Your account has been suspended. Contact Compass Motors."
           : result.error === "Database unavailable"
-          ? "Service temporarily unavailable. Please try again in a moment."
-          : "Invalid credentials. Please check your details and try again."
+          ? "Service temporarily unavailable. Please try again shortly."
+          : "Invalid credentials. Please check your details."
       );
     } else {
       router.push("/");
@@ -38,44 +38,45 @@ export default function LoginPage() {
     <>
       {!splashDone && <SplashScreen onComplete={() => setSplashDone(true)} />}
 
-      <div className="min-h-screen flex">
-        {/* ── Left Panel ── */}
+      <div className="min-h-screen flex" style={{ background: "#f5f5f0" }}>
+
+        {/* ── Left Brand Panel (desktop) ── */}
         <div
-          className="hidden lg:flex flex-col w-[52%] relative overflow-hidden"
-          style={{ background: "linear-gradient(160deg, #0f0f0f 0%, #1a0303 50%, #0f0f0f 100%)" }}
+          className="hidden lg:flex flex-col w-[50%] relative overflow-hidden"
+          style={{ background: "linear-gradient(160deg, #111010 0%, #1c0505 60%, #0d0d0d 100%)" }}
         >
-          {/* Subtle grid overlay */}
+          {/* Grid lines */}
           <div
-            className="absolute inset-0 opacity-[0.04]"
+            className="absolute inset-0"
             style={{
               backgroundImage:
-                "linear-gradient(#DC2626 1px, transparent 1px), linear-gradient(90deg, #DC2626 1px, transparent 1px)",
-              backgroundSize: "60px 60px",
+                "linear-gradient(rgba(220,38,38,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(220,38,38,0.06) 1px, transparent 1px)",
+              backgroundSize: "48px 48px",
             }}
           />
 
-          {/* Diagonal accent stripe */}
+          {/* Radial glow */}
           <div
-            className="absolute -right-20 top-0 bottom-0 w-40 opacity-10"
-            style={{ background: "linear-gradient(180deg, transparent, #DC2626, transparent)" }}
+            className="absolute"
+            style={{
+              width: 500,
+              height: 500,
+              borderRadius: "50%",
+              background: "radial-gradient(circle, rgba(185,28,28,0.18) 0%, transparent 70%)",
+              top: "30%",
+              left: "20%",
+              transform: "translate(-50%,-50%)",
+            }}
           />
 
-          {/* Large background motorcycle silhouette */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none">
-            <svg viewBox="0 0 600 300" className="w-[90%]" fill="white">
-              <circle cx="130" cy="210" r="72" />
-              <circle cx="470" cy="210" r="72" />
-              <path d="M130 210 L180 110 L310 90 L390 120 L470 210" fill="none" strokeWidth="18" stroke="white" strokeLinejoin="round" />
-              <path d="M310 90 Q330 40 360 30 L420 60 L390 120" fill="white" />
-              <circle cx="355" cy="60" r="34" />
-            </svg>
-          </div>
+          {/* Accent line */}
+          <div className="absolute right-0 top-0 bottom-0 w-px" style={{ background: "linear-gradient(180deg, transparent, rgba(220,38,38,0.3), transparent)" }} />
 
           {/* Content */}
-          <div className="relative z-10 flex flex-col h-full p-14 justify-between">
+          <div className="relative z-10 flex flex-col h-full px-12 py-12 justify-between">
             {/* Logo */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-red-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg" style={{ background: "#b91c1c" }}>
                 <svg viewBox="0 0 32 32" fill="none" className="w-6 h-6">
                   <circle cx="8" cy="22" r="4" fill="white" />
                   <circle cx="24" cy="22" r="4" fill="white" />
@@ -83,178 +84,209 @@ export default function LoginPage() {
                   <circle cx="16" cy="9" r="2" fill="white" />
                 </svg>
               </div>
-              <div>
-                <span className="text-white font-bold text-lg tracking-tight">Compass</span>
-                <span className="text-red-500 font-bold text-lg tracking-tight ml-1">Motors</span>
+              <div className="leading-tight">
+                <div className="text-white font-bold text-base tracking-tight">Compass Motors</div>
+                <div className="text-red-500/70 text-[11px] tracking-widest uppercase">Management Platform</div>
               </div>
             </div>
 
-            {/* Headline */}
+            {/* Main copy */}
             <div>
-              <div className="inline-block bg-red-600/20 border border-red-600/30 rounded-full px-4 py-1.5 mb-6">
-                <span className="text-red-400 text-xs font-semibold tracking-[0.15em] uppercase">
-                  Installment Management Platform
+              <div className="mb-6">
+                <span
+                  className="inline-block text-[11px] font-bold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full border"
+                  style={{ color: "#f87171", borderColor: "rgba(248,113,113,0.25)", background: "rgba(248,113,113,0.06)" }}
+                >
+                  Installment &amp; Work-and-Pay
                 </span>
               </div>
-              <h1 className="text-5xl font-bold text-white leading-[1.15] mb-5">
-                Manage your<br />
-                <span className="text-red-500">motorcycle</span><br />
-                payments with ease
+
+              <h1 className="text-[3.25rem] font-bold leading-[1.1] tracking-tight text-white mb-6">
+                The smarter way<br />
+                to manage<br />
+                <span style={{ color: "#f87171" }}>motorcycle sales</span>
               </h1>
-              <p className="text-gray-400 text-base leading-relaxed max-w-sm">
-                Track installments, manage contracts, and process payments — all from one secure, centralized platform.
+
+              <p className="text-gray-500 text-[15px] leading-relaxed max-w-xs">
+                Track contracts, record payments, and monitor installment plans — all from one secure platform.
               </p>
 
-              {/* Stats */}
-              <div className="mt-10 grid grid-cols-2 gap-3">
+              {/* Stats row */}
+              <div className="grid grid-cols-2 gap-3 mt-10">
                 {[
-                  { label: "Active Contracts", value: "500+" },
-                  { label: "Payments Processed", value: "GHS 2M+" },
-                  { label: "Happy Customers", value: "400+" },
-                  { label: "Years in Business", value: "10+" },
-                ].map((s) => (
+                  { v: "500+", l: "Active Contracts" },
+                  { v: "GHS 2M+", l: "Collected" },
+                  { v: "400+", l: "Customers" },
+                  { v: "10+", l: "Years Operating" },
+                ].map(s => (
                   <div
-                    key={s.label}
-                    className="rounded-xl p-4 border border-white/[0.06]"
-                    style={{ background: "rgba(255,255,255,0.03)" }}
+                    key={s.l}
+                    className="rounded-xl px-4 py-3.5 border"
+                    style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.06)" }}
                   >
-                    <div className="text-2xl font-bold text-white mb-0.5">{s.value}</div>
-                    <div className="text-gray-500 text-xs">{s.label}</div>
+                    <div className="text-2xl font-bold text-white tracking-tight">{s.v}</div>
+                    <div className="text-gray-600 text-xs mt-0.5">{s.l}</div>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Footer */}
-            <div className="flex items-center gap-3 text-gray-600 text-xs">
-              <span>Compass Motors</span>
-              <span className="w-px h-3 bg-gray-700" />
+            <div className="flex items-center gap-4 text-[11px] text-gray-700">
               <span>0593920144</span>
-              <span className="w-px h-3 bg-gray-700" />
+              <span className="w-px h-3 bg-gray-800" />
               <span>cmsspass@gmail.com</span>
+              <span className="w-px h-3 bg-gray-800" />
+              <span>&copy; {new Date().getFullYear()}</span>
             </div>
           </div>
         </div>
 
-        {/* ── Right Panel ── */}
-        <div className="flex-1 flex flex-col bg-white">
-          <div className="flex-1 flex items-center justify-center p-6 sm:p-10">
-            <div className="w-full max-w-[400px]">
+        {/* ── Right Form Panel ── */}
+        <div className="flex-1 flex flex-col" style={{ background: "#f5f5f0" }}>
 
-              {/* Mobile logo */}
-              <div className="lg:hidden mb-10 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-red-600 flex items-center justify-center">
-                  <svg viewBox="0 0 32 32" fill="none" className="w-5 h-5">
-                    <circle cx="8" cy="22" r="4" fill="white" />
-                    <circle cx="24" cy="22" r="4" fill="white" />
-                    <path d="M8 22 L16 9 L24 22" stroke="white" strokeWidth="2.5" fill="none" strokeLinejoin="round" />
-                    <circle cx="16" cy="9" r="2" fill="white" />
-                  </svg>
-                </div>
-                <div>
-                  <span className="text-gray-900 font-bold text-lg tracking-tight">Compass</span>
-                  <span className="text-red-600 font-bold text-lg tracking-tight ml-1">Motors</span>
-                </div>
-              </div>
-
-              {/* Heading */}
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Sign in</h2>
-                <p className="text-gray-500 text-sm mt-1">Enter your credentials to access your account</p>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Username field */}
-                <div className="space-y-1.5">
-                  <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                    Phone Number or Email
-                  </label>
-                  <input
-                    id="username"
-                    type="text"
-                    placeholder="0244123456 or admin@email.com"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    autoComplete="username"
-                    required
-                    className="w-full h-11 px-3.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-400 outline-none transition-all focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/10"
-                  />
-                </div>
-
-                {/* Password field */}
-                <div className="space-y-1.5">
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                    Password
-                  </label>
-                  <div className="relative">
-                    <input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      autoComplete="current-password"
-                      required
-                      className="w-full h-11 px-3.5 pr-10 rounded-lg border border-gray-200 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-400 outline-none transition-all focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Error */}
-                {error && (
-                  <div className="flex items-start gap-2.5 bg-red-50 border border-red-100 text-red-700 px-4 py-3 rounded-lg text-sm">
-                    <svg className="w-4 h-4 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                    <span>{error}</span>
-                  </div>
-                )}
-
-                {/* Submit */}
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full h-11 mt-2 rounded-lg bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-sm font-semibold tracking-wide transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {loading ? (
-                    <>
-                      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                      </svg>
-                      Signing in...
-                    </>
-                  ) : (
-                    "Sign In"
-                  )}
-                </button>
-              </form>
-
-              {/* Divider */}
-              <div className="mt-8 pt-6 border-t border-gray-100 text-center">
-                <p className="text-xs text-gray-400">Need help accessing your account?</p>
-                <a
-                  href="tel:0593920144"
-                  className="inline-block mt-1 text-sm font-semibold text-red-600 hover:text-red-700 transition-colors"
-                >
-                  Call 0593920144
-                </a>
-              </div>
-
+          {/* Mobile top bar */}
+          <div
+            className="lg:hidden flex items-center gap-3 px-6 pt-12 pb-8"
+            style={{ background: "linear-gradient(160deg, #1a0505 0%, #111010 100%)" }}
+          >
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#b91c1c" }}>
+              <svg viewBox="0 0 32 32" fill="none" className="w-5 h-5">
+                <circle cx="8" cy="22" r="4" fill="white" />
+                <circle cx="24" cy="22" r="4" fill="white" />
+                <path d="M8 22 L16 9 L24 22" stroke="white" strokeWidth="2.5" fill="none" strokeLinejoin="round" />
+                <circle cx="16" cy="9" r="2" fill="white" />
+              </svg>
+            </div>
+            <div className="leading-tight">
+              <div className="text-white font-bold text-sm tracking-tight">Compass Motors</div>
+              <div className="text-red-400/70 text-[10px] tracking-widest uppercase">Management Platform</div>
             </div>
           </div>
 
-          {/* Bottom bar */}
-          <div className="border-t border-gray-100 px-6 py-4 flex items-center justify-between">
-            <span className="text-xs text-gray-400">Compass Motors &copy; {new Date().getFullYear()}</span>
-            <span className="text-xs text-gray-400">Secured platform</span>
+          {/* Form container */}
+          <div className="flex-1 flex items-center justify-center p-6">
+            <div className="w-full max-w-[420px]">
+
+              {/* Card */}
+              <div className="bg-white rounded-2xl shadow-sm border border-black/[0.06] overflow-hidden">
+
+                {/* Card header */}
+                <div className="px-8 pt-8 pb-6 border-b border-gray-100">
+                  <div className="hidden lg:flex items-center gap-2.5 mb-6">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "#b91c1c" }}>
+                      <svg viewBox="0 0 32 32" fill="none" className="w-4.5 h-4.5">
+                        <circle cx="8" cy="22" r="4" fill="white" />
+                        <circle cx="24" cy="22" r="4" fill="white" />
+                        <path d="M8 22 L16 9 L24 22" stroke="white" strokeWidth="2.5" fill="none" strokeLinejoin="round" />
+                        <circle cx="16" cy="9" r="2" fill="white" />
+                      </svg>
+                    </div>
+                    <span className="text-gray-900 font-bold text-sm tracking-tight">Compass Motors</span>
+                  </div>
+                  <h2 className="text-[1.6rem] font-bold text-gray-900 tracking-tight leading-tight">Welcome back</h2>
+                  <p className="text-gray-400 text-sm mt-1">Sign in to your account to continue</p>
+                </div>
+
+                {/* Form body */}
+                <div className="px-8 py-7">
+                  <form onSubmit={handleSubmit} className="space-y-5">
+
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2">
+                        Phone or Email
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="0244123456 or email@example.com"
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
+                        autoComplete="username"
+                        required
+                        className="w-full h-12 px-4 rounded-xl border text-gray-900 text-sm placeholder:text-gray-300 outline-none transition-all"
+                        style={{
+                          background: "#fafafa",
+                          borderColor: "#e5e5e5",
+                        }}
+                        onFocus={e => { e.target.style.borderColor = "#b91c1c"; e.target.style.boxShadow = "0 0 0 3px rgba(185,28,28,0.08)"; e.target.style.background = "#fff"; }}
+                        onBlur={e => { e.target.style.borderColor = "#e5e5e5"; e.target.style.boxShadow = "none"; e.target.style.background = "#fafafa"; }}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2">
+                        Password
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Enter your password"
+                          value={password}
+                          onChange={e => setPassword(e.target.value)}
+                          autoComplete="current-password"
+                          required
+                          className="w-full h-12 px-4 pr-11 rounded-xl border text-gray-900 text-sm placeholder:text-gray-300 outline-none transition-all"
+                          style={{
+                            background: "#fafafa",
+                            borderColor: "#e5e5e5",
+                          }}
+                          onFocus={e => { e.target.style.borderColor = "#b91c1c"; e.target.style.boxShadow = "0 0 0 3px rgba(185,28,28,0.08)"; e.target.style.background = "#fff"; }}
+                          onBlur={e => { e.target.style.borderColor = "#e5e5e5"; e.target.style.boxShadow = "none"; e.target.style.background = "#fafafa"; }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors"
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {error && (
+                      <div
+                        className="flex items-start gap-3 px-4 py-3 rounded-xl text-sm"
+                        style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#b91c1c" }}
+                      >
+                        <svg className="w-4 h-4 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        <span>{error}</span>
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full h-12 rounded-xl text-white font-bold text-sm tracking-wide transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2.5 mt-1"
+                      style={{ background: loading ? "#9b1c1c" : "linear-gradient(135deg, #b91c1c 0%, #991b1b 100%)", boxShadow: "0 4px 20px rgba(185,28,28,0.3)" }}
+                    >
+                      {loading ? (
+                        <>
+                          <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                          Signing in...
+                        </>
+                      ) : "Sign In"}
+                    </button>
+                  </form>
+                </div>
+
+                {/* Card footer */}
+                <div className="px-8 py-5 border-t border-gray-100 flex items-center justify-between bg-gray-50/60">
+                  <span className="text-xs text-gray-400">Need help?</span>
+                  <a href="tel:0593920144" className="text-xs font-bold transition-colors" style={{ color: "#b91c1c" }}>
+                    Call 0593920144
+                  </a>
+                </div>
+              </div>
+
+              <p className="text-center text-xs text-gray-400 mt-6">
+                Compass Motors &copy; {new Date().getFullYear()} &middot; Secured Platform
+              </p>
+            </div>
           </div>
         </div>
       </div>
