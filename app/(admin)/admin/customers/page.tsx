@@ -1,13 +1,10 @@
 import React from "react";
 import Link from "next/link";
 import { AdminHeader } from "@/components/admin/AdminHeader";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { connectDB } from "@/lib/db/connect";
 import Customer from "@/lib/db/models/Customer";
 import { formatDate } from "@/lib/utils";
-import { Plus, Search, Users } from "lucide-react";
+import { Plus, Users } from "lucide-react";
 import { CustomerSearch } from "@/components/admin/CustomerSearch";
 
 async function getCustomers(search?: string) {
@@ -24,6 +21,11 @@ async function getCustomers(search?: string) {
   return JSON.parse(JSON.stringify(customers));
 }
 
+const statusStyle: Record<string, { dot: string; text: string }> = {
+  active:    { dot: "bg-emerald-500", text: "text-emerald-700" },
+  suspended: { dot: "bg-amber-500",   text: "text-amber-700" },
+};
+
 export default async function CustomersPage({
   searchParams,
 }: {
@@ -31,125 +33,116 @@ export default async function CustomersPage({
 }) {
   const params = await searchParams;
   const customers = await getCustomers(params.search);
-
-  const statusVariant = (status: string): "success" | "warning" | "default" => {
-    if (status === "active") return "success";
-    if (status === "suspended") return "warning";
-    return "default";
-  };
+  const activeCount = customers.filter((c: any) => c.status === "active").length;
 
   return (
     <>
-      <AdminHeader title="Customers" subtitle={`${customers.length} customers registered`} />
-      <div className="p-6 space-y-4">
+      <AdminHeader title="Customers" subtitle={`${customers.length} registered`} />
+
+      <div className="p-4 sm:p-6 space-y-4">
+        {/* Toolbar */}
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-          <CustomerSearch />
-          <Link href="/admin/customers/new">
-            <Button className="flex items-center gap-2">
-              <Plus className="w-4 h-4" />
-              Register Customer
-            </Button>
-          </Link>
+          <div className="flex items-center gap-4 text-sm text-gray-500">
+            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500" />{activeCount} active</span>
+            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-gray-300" />{customers.length - activeCount} other</span>
+          </div>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <CustomerSearch />
+            <Link href="/admin/customers/new" className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors shrink-0">
+              <Plus className="w-4 h-4" /><span className="hidden sm:inline">Register</span><span className="sm:hidden">New</span>
+            </Link>
+          </div>
         </div>
 
         {customers.length === 0 ? (
-          <Card>
-            <CardContent className="py-16 text-center">
-              <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 font-medium">No customers found</p>
-              <p className="text-gray-400 text-sm mt-1">Register your first customer to get started</p>
-              <Link href="/admin/customers/new" className="mt-4 inline-block">
-                <Button size="sm">Register Customer</Button>
-              </Link>
-            </CardContent>
-          </Card>
+          <div className="rounded-2xl bg-white border border-gray-100 shadow-sm py-20 text-center">
+            <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+              <Users className="w-7 h-7 text-gray-400" />
+            </div>
+            <p className="font-semibold text-gray-900 mb-1">No customers found</p>
+            <p className="text-gray-400 text-sm mb-5">Register your first customer to get started</p>
+            <Link href="/admin/customers/new" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors">
+              <Plus className="w-4 h-4" /> Register Customer
+            </Link>
+          </div>
         ) : (
           <>
-            {/* Desktop Table */}
-            <div className="hidden md:block">
-              <Card>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="bg-gray-50 border-b border-gray-200">
-                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
-                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th>
-                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone</th>
-                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Registered</th>
-                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {customers.map((customer: any) => (
-                        <tr key={customer._id} className="hover:bg-gray-50 transition-colors">
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              {customer.passportPhoto ? (
-                                <img src={customer.passportPhoto} alt="" className="w-9 h-9 rounded-full object-cover" />
-                              ) : (
-                                <div className="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-semibold text-sm">
-                                  {customer.fullName.charAt(0)}
-                                </div>
-                              )}
-                              <div>
-                                <p className="font-medium text-gray-900 text-sm">{customer.fullName}</p>
-                                <p className="text-xs text-gray-500">{customer.email || "No email"}</p>
+            {/* Desktop table */}
+            <div className="hidden md:block rounded-2xl bg-white border border-gray-100 shadow-sm overflow-hidden">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-100">
+                    {["Customer", "ID", "Phone", "Status", "Joined", ""].map((h) => (
+                      <th key={h} className="text-left px-5 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {customers.map((c: any) => {
+                    const s = statusStyle[c.status] || { dot: "bg-gray-400", text: "text-gray-600" };
+                    return (
+                      <tr key={c._id} className="hover:bg-gray-50/70 transition-colors group">
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center gap-3">
+                            {c.passportPhoto ? (
+                              <img src={c.passportPhoto} alt="" className="w-8 h-8 rounded-full object-cover shrink-0" />
+                            ) : (
+                              <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold text-xs shrink-0">
+                                {c.fullName.charAt(0)}
                               </div>
+                            )}
+                            <div>
+                              <p className="font-semibold text-gray-900 text-sm">{c.fullName}</p>
+                              <p className="text-xs text-gray-400">{c.email || "—"}</p>
                             </div>
-                          </td>
-                          <td className="px-6 py-4 text-sm font-mono text-gray-700">{customer.customerId}</td>
-                          <td className="px-6 py-4 text-sm text-gray-700">{customer.phone}</td>
-                          <td className="px-6 py-4">
-                            <Badge variant={statusVariant(customer.status)}>
-                              {customer.status.charAt(0).toUpperCase() + customer.status.slice(1)}
-                            </Badge>
-                          </td>
-                          <td className="px-6 py-4 text-sm text-gray-500">{formatDate(customer.createdAt)}</td>
-                          <td className="px-6 py-4">
-                            <Link href={`/admin/customers/${customer._id}`}>
-                              <Button size="sm" variant="outline">View</Button>
-                            </Link>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Card>
+                          </div>
+                        </td>
+                        <td className="px-5 py-3.5 text-xs font-mono text-gray-500">{c.customerId}</td>
+                        <td className="px-5 py-3.5 text-sm text-gray-700">{c.phone}</td>
+                        <td className="px-5 py-3.5">
+                          <span className={`inline-flex items-center gap-1.5 text-sm font-medium ${s.text}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
+                            {c.status.charAt(0).toUpperCase() + c.status.slice(1)}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3.5 text-sm text-gray-400">{formatDate(c.createdAt)}</td>
+                        <td className="px-5 py-3.5 text-right">
+                          <Link href={`/admin/customers/${c._id}`} className="text-xs font-semibold text-red-600 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity">
+                            View →
+                          </Link>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
 
-            {/* Mobile Cards */}
-            <div className="md:hidden space-y-3">
-              {customers.map((customer: any) => (
-                <Card key={customer._id}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3 mb-3">
-                      {customer.passportPhoto ? (
-                        <img src={customer.passportPhoto} alt="" className="w-11 h-11 rounded-full object-cover" />
+            {/* Mobile list */}
+            <div className="md:hidden space-y-2">
+              {customers.map((c: any) => {
+                const s = statusStyle[c.status] || { dot: "bg-gray-400", text: "text-gray-500" };
+                return (
+                  <Link key={c._id} href={`/admin/customers/${c._id}`}>
+                    <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-100 shadow-sm active:bg-gray-50">
+                      {c.passportPhoto ? (
+                        <img src={c.passportPhoto} alt="" className="w-10 h-10 rounded-full object-cover shrink-0" />
                       ) : (
-                        <div className="w-11 h-11 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-semibold">
-                          {customer.fullName.charAt(0)}
+                        <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold shrink-0">
+                          {c.fullName.charAt(0)}
                         </div>
                       )}
-                      <div className="flex-1">
-                        <p className="font-semibold text-gray-900">{customer.fullName}</p>
-                        <p className="text-sm text-gray-500">{customer.customerId}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-gray-900 text-sm truncate">{c.fullName}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{c.phone} · <span className="font-mono">{c.customerId}</span></p>
                       </div>
-                      <Badge variant={statusVariant(customer.status)}>
-                        {customer.status}
-                      </Badge>
+                      <span className={`flex items-center gap-1 text-xs font-medium ${s.text} shrink-0`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />{c.status}
+                      </span>
                     </div>
-                    <div className="grid grid-cols-2 gap-2 text-sm mb-3">
-                      <div><span className="text-gray-400">Phone: </span><span className="font-medium">{customer.phone}</span></div>
-                      <div><span className="text-gray-400">Joined: </span><span>{formatDate(customer.createdAt)}</span></div>
-                    </div>
-                    <Link href={`/admin/customers/${customer._id}`}>
-                      <Button size="sm" variant="outline" className="w-full">View Details</Button>
-                    </Link>
-                  </CardContent>
-                </Card>
-              ))}
+                  </Link>
+                );
+              })}
             </div>
           </>
         )}
