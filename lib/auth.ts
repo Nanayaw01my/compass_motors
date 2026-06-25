@@ -6,25 +6,26 @@ import Admin from "@/lib/db/models/Admin";
 import Customer from "@/lib/db/models/Customer";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
   providers: [
     CredentialsProvider({
       name: "credentials",
       credentials: {
         username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" },
-        role: { label: "Role", type: "text" },
       },
       async authorize(credentials) {
         if (!credentials?.username || !credentials?.password) return null;
 
         await connectDB();
 
-        const role = credentials.role as string || "customer";
+        const username = credentials.username as string;
+        const password = credentials.password as string;
 
-        if (role === "admin") {
-          const admin = await Admin.findOne({ email: credentials.username });
-          if (!admin) return null;
-          const isValid = await bcrypt.compare(credentials.password as string, admin.password);
+        // Try admin first (email format)
+        const admin = await Admin.findOne({ email: username.toLowerCase() });
+        if (admin) {
+          const isValid = await bcrypt.compare(password, admin.password);
           if (!isValid) return null;
           return {
             id: admin._id.toString(),
@@ -32,20 +33,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             email: admin.email,
             role: "admin",
           };
-        } else {
-          const customer = await Customer.findOne({ username: credentials.username });
-          if (!customer) return null;
-          if (customer.status === "suspended") throw new Error("Account suspended");
-          const isValid = await bcrypt.compare(credentials.password as string, customer.password);
-          if (!isValid) return null;
-          return {
-            id: customer._id.toString(),
-            name: customer.fullName,
-            email: customer.email || "",
-            role: "customer",
-            customerId: customer.customerId,
-          };
         }
+
+        // Try customer (phone number as username)
+        const customer = await Customer.findOne({ username });
+        if (!customer) return null;
+        if (customer.status === "suspended") throw new Error("Account suspended");
+        const isValid = await bcrypt.compare(password, customer.password);
+        if (!isValid) return null;
+        return {
+          id: customer._id.toString(),
+          name: customer.fullName,
+          email: customer.email || "",
+          role: "customer",
+          customerId: customer.customerId,
+        };
       },
     }),
   ],

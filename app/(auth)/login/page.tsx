@@ -6,11 +6,10 @@ import { Logo } from "@/components/shared/Logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Phone, Lock, Shield } from "lucide-react";
+import { Eye, EyeOff, Lock, User } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -25,17 +24,19 @@ export default function LoginPage() {
     const result = await signIn("credentials", {
       username,
       password,
-      role: isAdmin ? "admin" : "customer",
       redirect: false,
     });
 
     setLoading(false);
 
     if (result?.error) {
-      setError(result.error === "Account suspended" ? "Your account has been suspended. Contact support." : "Invalid credentials. Please try again.");
+      setError(
+        result.error === "Account suspended"
+          ? "Your account has been suspended. Please contact Compass Motors."
+          : "Invalid credentials. Please check and try again."
+      );
     } else {
-      router.push(isAdmin ? "/admin/dashboard" : "/customer/dashboard");
-
+      router.push("/");
       router.refresh();
     }
   };
@@ -66,17 +67,17 @@ export default function LoginPage() {
             ))}
           </div>
         </div>
-        <div className="text-red-300 text-sm">
-          <p>Compass Motors · 0593920144 · cmsspass@gmail.com</p>
-        </div>
+        <p className="text-red-300 text-sm">
+          Compass Motors · 0593920144 · cmsspass@gmail.com
+        </p>
       </div>
 
       {/* Right — Login Form */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-12">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-12 bg-white">
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
-          <div className="lg:hidden mb-8 flex justify-center">
-            <Logo size="md" />
+          <div className="lg:hidden mb-10 flex justify-center">
+            <Logo size="lg" />
           </div>
 
           <div className="mb-8">
@@ -84,42 +85,21 @@ export default function LoginPage() {
             <p className="text-gray-500">Sign in to your Compass Motors account</p>
           </div>
 
-          {/* Role Toggle */}
-          <div className="flex gap-2 mb-6 bg-gray-100 p-1 rounded-xl">
-            <button
-              onClick={() => { setIsAdmin(false); setError(""); }}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                !isAdmin ? "bg-white shadow text-red-600" : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              <Phone className="w-4 h-4" />
-              Customer
-            </button>
-            <button
-              onClick={() => { setIsAdmin(true); setError(""); }}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                isAdmin ? "bg-white shadow text-red-600" : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              <Shield className="w-4 h-4" />
-              Admin
-            </button>
-          </div>
-
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <Label htmlFor="username">{isAdmin ? "Email Address" : "Phone Number"}</Label>
+              <Label htmlFor="username">Phone Number or Email</Label>
               <div className="relative mt-1">
                 <Input
                   id="username"
-                  type={isAdmin ? "email" : "tel"}
-                  placeholder={isAdmin ? "admin@compassmotors.com" : "0244123456"}
+                  type="text"
+                  placeholder="0244123456 or admin@email.com"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="pl-10"
+                  autoComplete="username"
                   required
                 />
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               </div>
             </div>
 
@@ -133,6 +113,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10 pr-10"
+                  autoComplete="current-password"
                   required
                 />
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -159,7 +140,7 @@ export default function LoginPage() {
 
           <div className="mt-8 text-center text-sm text-gray-500">
             <p>Need help? Contact us at</p>
-            <a href="tel:0593920144" className="text-red-600 font-medium hover:underline">
+            <a href="tel:0593920144" className="text-red-600 font-semibold hover:underline">
               0593920144
             </a>
           </div>
