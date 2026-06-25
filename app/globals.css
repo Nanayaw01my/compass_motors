@@ -53,6 +53,16 @@
   border-radius: 3px;
 }
 
+/* Wheel spin animation for splash screen */
+@keyframes wheel-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.wheel-spin {
+  animation: wheel-spin 0.4s linear infinite;
+}
+
 /* Print styles */
 @media print {
   .no-print {

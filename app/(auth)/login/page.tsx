@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
+import { SplashScreen } from "@/components/shared/SplashScreen";
 
 export default function LoginPage() {
   const router = useRouter();
+  const [splashDone, setSplashDone] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -42,6 +44,8 @@ export default function LoginPage() {
   };
 
   return (
+    <>
+      {!splashDone && <SplashScreen onComplete={() => setSplashDone(true)} />}
     <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Left — Brand Panel */}
       <div className="hidden lg:flex flex-col w-[45%] bg-gradient-to-br from-red-600 via-red-700 to-red-900 p-12 justify-between">
@@ -147,5 +151,6 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
