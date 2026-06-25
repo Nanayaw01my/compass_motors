@@ -17,7 +17,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.username || !credentials?.password) return null;
 
-        await connectDB();
+        try {
+          await connectDB();
+        } catch (err) {
+          console.error("[Auth] Database connection failed:", err);
+          throw new Error("Database unavailable");
+        }
 
         const username = credentials.username as string;
         const password = credentials.password as string;

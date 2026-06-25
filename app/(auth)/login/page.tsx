@@ -24,6 +24,8 @@ export default function LoginPage() {
       setError(
         result.error === "Account suspended"
           ? "Your account has been suspended. Please contact Compass Motors."
+          : result.error === "Database unavailable"
+          ? "Service temporarily unavailable. Please try again in a moment."
           : "Invalid credentials. Please check your details and try again."
       );
     } else {
