@@ -8,7 +8,7 @@ export function CustomerProfileActions() {
     <Button
       variant="outline"
       className="w-full text-red-600 border-red-200 hover:bg-red-50"
-      onClick={() => signOut({ callbackUrl: "/login" })}
+      onClick={() => signOut({ callbackUrl: `${window.location.origin}/login` })}
     >
       <LogOut className="w-4 h-4 mr-2" />
       Sign Out
