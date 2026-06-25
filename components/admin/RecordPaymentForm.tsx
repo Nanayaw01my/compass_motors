@@ -106,7 +106,6 @@ export function RecordPaymentForm({ contractId, remainingBalance, weeklyAmount, 
                   <SelectItem value="cash">Cash</SelectItem>
                   <SelectItem value="mobile-money">Mobile Money</SelectItem>
                   <SelectItem value="bank-transfer">Bank Transfer</SelectItem>
-                  <SelectItem value="paystack">Paystack</SelectItem>
                 </SelectContent>
               </Select>
             </div>
