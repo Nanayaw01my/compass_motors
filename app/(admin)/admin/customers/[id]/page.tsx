@@ -55,7 +55,9 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 <img src={customer.passportPhoto} alt="" className="w-24 h-24 rounded-full object-cover mx-auto mb-3" />
               ) : (
                 <div className="w-24 h-24 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-3">
-                  <span className="text-4xl font-bold text-red-600">{customer.fullName.charAt(0)}</span>
+                  <span className="text-3xl font-bold text-red-600">
+                    {customer.fullName.trim().split(" ").filter(Boolean).map((n: string) => n[0]).join("").slice(0, 2).toUpperCase()}
+                  </span>
                 </div>
               )}
               <h2 className="font-bold text-lg text-gray-900 mb-1">{customer.fullName}</h2>
@@ -80,7 +82,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 <p className="text-xs text-gray-500 mt-1">Contracts</p>
               </CardContent></Card>
               <Card><CardContent className="p-4 text-center">
-                <p className="text-2xl font-bold text-green-600">{formatCurrency(totalPaid)}</p>
+                <p className="text-lg font-bold text-green-600 truncate">{formatCurrency(totalPaid)}</p>
                 <p className="text-xs text-gray-500 mt-1">Total Paid</p>
               </CardContent></Card>
               <Card><CardContent className="p-4 text-center">
