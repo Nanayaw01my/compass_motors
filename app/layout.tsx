@@ -10,9 +10,15 @@ const geistSans = Geist({
 
 export const metadata: Metadata = {
   title: "Compass Motors – Installment Management System",
-  description: "Motorcycle installment and work-and-pay management platform",
+  description: "Motorcycle installment and work-and-pay management platform for Compass Motors Ghana.",
   manifest: "/manifest.json",
-  icons: { icon: "/icons/icon-192.png", apple: "/icons/icon-192.png" },
+  metadataBase: new URL("https://www.compassmotors.online"),
+  openGraph: {
+    title: "Compass Motors",
+    description: "Motorcycle installment and work-and-pay management platform",
+    siteName: "Compass Motors",
+    type: "website",
+  },
 };
 
 export const viewport: Viewport = {
