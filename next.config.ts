@@ -18,7 +18,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://res.cloudinary.com https://*.cloudinary.com",
       "font-src 'self'",
-      "connect-src 'self' https://compassmotor.online https://www.compassmotor.online",
+      "connect-src 'self' https://compassmotors.online https://www.compassmotors.online https://compassmotor.online https://www.compassmotor.online",
       "frame-ancestors 'none'",
     ].join("; "),
   },
