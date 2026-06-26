@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { connectDB } from "@/lib/db/connect";
 import Contract from "@/lib/db/models/Contract";
 import Payment from "@/lib/db/models/Payment";
@@ -11,8 +10,9 @@ import { formatCurrency, formatDate, formatDateTime, calculateProgress } from "@
 import { Progress } from "@/components/ui/progress";
 import { RecordPaymentForm } from "@/components/admin/RecordPaymentForm";
 import { SendReminderButton } from "@/components/admin/SendReminderButton";
+import { ContractActions } from "@/components/admin/ContractActions";
 import Link from "next/link";
-import { Users, Bike, CreditCard } from "lucide-react";
+import { Users, Bike, CreditCard, Calendar, ExternalLink } from "lucide-react";
 
 async function getContractDetails(id: string) {
   await connectDB();
@@ -48,6 +48,9 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
   const progress = calculateProgress(contract.totalPaid, contract.sellingPrice);
   const sc = statusConfig[contract.status] || { variant: "default" };
 
+  const nextDue = contract.nextPaymentDate ? new Date(contract.nextPaymentDate) : null;
+  const isNextDueOverdue = nextDue && nextDue < new Date();
+
   return (
     <>
       <AdminHeader title={contract.contractNumber} subtitle={`${customer?.fullName} · ${moto?.brand} ${moto?.model}`} />
@@ -77,6 +80,11 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
                     </Link>
                     <p className="text-sm text-gray-500">{customer?.phone}</p>
                   </div>
+                  <ContractActions
+                    contractId={contract._id}
+                    status={contract.status}
+                    currentNotes={contract.notes}
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
@@ -109,10 +117,38 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
                   <Progress value={progress} className="flex-1" />
                   <span className="text-sm font-bold text-gray-700">{progress}%</span>
                 </div>
-                <div className="flex justify-between text-xs text-gray-400 mt-1 mb-4">
+                <div className="flex justify-between text-xs text-gray-400 mt-1 mb-3">
                   <span>Started: {formatDate(contract.startDate)}</span>
                   <span>Progress: {formatCurrency(contract.totalPaid)} / {formatCurrency(contract.sellingPrice)}</span>
                 </div>
+
+                {/* Next payment due */}
+                {nextDue && (
+                  <div className={`flex items-center gap-2 rounded-xl px-4 py-2.5 mb-3 text-sm font-semibold ${
+                    isNextDueOverdue
+                      ? "bg-red-50 text-red-700 border border-red-200"
+                      : "bg-blue-50 text-blue-700 border border-blue-200"
+                  }`}>
+                    <Calendar className="w-4 h-4 shrink-0" />
+                    <span>
+                      {isNextDueOverdue ? "Payment overdue since " : "Next payment due: "}
+                      <strong>{formatDate(nextDue)}</strong>
+                    </span>
+                    {contract.weeklyInstallment && (
+                      <span className="ml-auto text-xs font-medium opacity-70">Weekly · {formatCurrency(contract.weeklyInstallment)}</span>
+                    )}
+                    {contract.monthlyInstallment && (
+                      <span className="ml-auto text-xs font-medium opacity-70">Monthly · {formatCurrency(contract.monthlyInstallment)}</span>
+                    )}
+                  </div>
+                )}
+
+                {/* Notes */}
+                {contract.notes && (
+                  <div className="rounded-xl bg-amber-50 border border-amber-100 px-4 py-2.5 mb-3 text-sm text-amber-800">
+                    <span className="font-semibold">Note: </span>{contract.notes}
+                  </div>
+                )}
 
                 {/* SMS Reminder — always visible if customer has a phone */}
                 {customer?.phone && (
@@ -144,11 +180,18 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
                       <div>
                         <p className="text-sm font-bold text-green-600">{formatCurrency(p.amount)}</p>
                         <p className="text-xs text-gray-400">{formatDateTime(p.createdAt)}</p>
-                        <p className="text-xs text-gray-400">{p.paymentMethod}</p>
+                        <p className="text-xs text-gray-400 capitalize">{p.paymentMethod.replace(/-/g, " ")}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-xs font-mono text-gray-400">{p.receiptNumber}</p>
-                        <p className="text-xs text-red-500">Bal: {formatCurrency(p.balanceAfter)}</p>
+                        <p className="text-xs text-red-500 mb-1">Bal: {formatCurrency(p.balanceAfter)}</p>
+                        <Link
+                          href={`/api/receipts/${p._id}`}
+                          target="_blank"
+                          className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium"
+                        >
+                          <ExternalLink className="w-3 h-3" />Receipt
+                        </Link>
                       </div>
                     </div>
                   ))

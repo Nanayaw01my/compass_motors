@@ -70,6 +70,13 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               </div>
               <div className="mt-4 space-y-2">
                 <CustomerActions customerId={id} currentStatus={customer.status} />
+                <Link
+                  href={`/api/statements/${id}`}
+                  target="_blank"
+                  className="flex items-center justify-center gap-2 w-full h-9 rounded-xl border border-blue-200 bg-blue-50 text-blue-700 text-sm font-semibold hover:bg-blue-100 transition-colors"
+                >
+                  View Statement
+                </Link>
               </div>
             </CardContent>
           </Card>

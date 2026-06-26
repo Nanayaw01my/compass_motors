@@ -5,13 +5,32 @@ import { connectDB } from "@/lib/db/connect";
 import Contract from "@/lib/db/models/Contract";
 import { formatCurrency, formatDate, calculateProgress } from "@/lib/utils";
 import { Plus, FileText } from "lucide-react";
+import { ContractSearch } from "@/components/admin/ContractSearch";
 
-async function getContracts() {
+async function getContracts(search?: string, status?: string) {
   await connectDB();
-  const contracts = await Contract.find()
+  const query: Record<string, any> = {};
+  if (status) query.status = status;
+  if (search) {
+    // We need to cross-reference — fetch matching customer IDs first
+    const Customer = (await import("@/lib/db/models/Customer")).default;
+    const customers = await Customer.find({
+      $or: [
+        { fullName: { $regex: search, $options: "i" } },
+        { customerId: { $regex: search, $options: "i" } },
+        { phone: { $regex: search, $options: "i" } },
+      ],
+    }).select("_id");
+    query.$or = [
+      { contractNumber: { $regex: search, $options: "i" } },
+      { customer: { $in: customers.map((c) => c._id) } },
+    ];
+  }
+  const contracts = await Contract.find(query)
     .populate("customer", "fullName customerId phone")
     .populate("motorcycle", "brand model year images")
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .limit(200);
   return JSON.parse(JSON.stringify(contracts));
 }
 
@@ -23,8 +42,13 @@ const statusConfig: Record<string, { dot: string; bg: string; text: string; labe
   cancelled: { dot: "bg-gray-400",    bg: "bg-gray-50",     text: "text-gray-600",    label: "Cancelled" },
 };
 
-export default async function ContractsPage() {
-  const contracts = await getContracts();
+export default async function ContractsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ search?: string; status?: string }>;
+}) {
+  const params = await searchParams;
+  const contracts = await getContracts(params.search, params.status);
   const counts = contracts.reduce((acc: any, c: any) => { acc[c.status] = (acc[c.status] || 0) + 1; return acc; }, {});
 
   return (
@@ -32,22 +56,25 @@ export default async function ContractsPage() {
       <AdminHeader title="Contracts" subtitle={`${contracts.length} total`} />
 
       <div className="p-4 sm:p-6 space-y-4">
-        {/* Summary chips */}
-        <div className="flex items-center justify-between">
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(counts).map(([status, count]: any) => {
-              const s = statusConfig[status];
-              if (!s) return null;
-              return (
-                <span key={status} className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${s.bg} ${s.text}`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />{count} {s.label}
-                </span>
-              );
-            })}
+        {/* Toolbar */}
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex flex-wrap gap-2">
+              {Object.entries(counts).map(([status, count]: any) => {
+                const s = statusConfig[status];
+                if (!s) return null;
+                return (
+                  <span key={status} className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${s.bg} ${s.text}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />{count} {s.label}
+                  </span>
+                );
+              })}
+            </div>
+            <Link href="/admin/contracts/new" className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors shrink-0">
+              <Plus className="w-4 h-4" /><span className="hidden sm:inline">New Contract</span><span className="sm:hidden">New</span>
+            </Link>
           </div>
-          <Link href="/admin/contracts/new" className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors shrink-0">
-            <Plus className="w-4 h-4" /><span className="hidden sm:inline">New Contract</span><span className="sm:hidden">New</span>
-          </Link>
+          <ContractSearch />
         </div>
 
         {contracts.length === 0 ? (

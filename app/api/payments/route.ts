@@ -58,8 +58,26 @@ export async function POST(req: NextRequest) {
     const balanceAfter  = contract.remainingBalance;
     const isCompleted   = balanceAfter <= 0;
 
-    if (isCompleted) {
-      await Contract.findByIdAndUpdate(contractId, { status: "completed" });
+    // Advance nextPaymentDate and reset overdue→active (or complete if done)
+    const contractFull = await Contract.findById(contractId);
+    if (contractFull) {
+      const statusUpdate = isCompleted ? "completed" : "active";
+      let nextPaymentDate: Date | undefined;
+      if (!isCompleted) {
+        const base = contractFull.nextPaymentDate
+          ? new Date(Math.max(contractFull.nextPaymentDate.getTime(), Date.now()))
+          : new Date();
+        if (contractFull.weeklyInstallment) {
+          nextPaymentDate = new Date(base);
+          nextPaymentDate.setDate(nextPaymentDate.getDate() + 7);
+        } else if (contractFull.monthlyInstallment) {
+          nextPaymentDate = new Date(base);
+          nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
+        }
+      }
+      await Contract.findByIdAndUpdate(contractId, {
+        $set: { status: statusUpdate, ...(nextPaymentDate ? { nextPaymentDate } : {}) },
+      });
     }
 
     const seq = await getNextSequence("receipt");

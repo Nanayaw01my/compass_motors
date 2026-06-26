@@ -9,6 +9,8 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { Users, Bike, FileText, CreditCard, TrendingUp, AlertCircle, CheckCircle, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { AdminDashboardChart } from "@/components/admin/AdminDashboardChart";
+import { BulkActions } from "@/components/admin/BulkActions";
+import { ExportButton } from "@/components/admin/ExportButton";
 
 async function getDashboardStats() {
   await connectDB();
@@ -39,6 +41,14 @@ async function getDashboardStats() {
     Payment.aggregate([{ $match: { status: "successful" } }, { $group: { _id: null, total: { $sum: "$amount" } } }]),
   ]);
 
+  const totalExpected = (await Contract.aggregate([
+    { $match: {} },
+    { $group: { _id: null, total: { $sum: "$sellingPrice" } } },
+  ]))[0]?.total || 0;
+
+  const rev = totalRevenue[0]?.total || 0;
+  const collectionRate = totalExpected > 0 ? Math.round((rev / totalExpected) * 100) : 0;
+
   return {
     totalCustomers, activeCustomers,
     totalMotorcycles, availableMotorcycles, soldMotorcycles,
@@ -46,8 +56,9 @@ async function getDashboardStats() {
     recentPayments: JSON.parse(JSON.stringify(recentPayments)),
     monthlyCollection: monthlyPayments[0]?.total || 0,
     weeklyCollection: weeklyPayments[0]?.total || 0,
-    totalRevenue: totalRevenue[0]?.total || 0,
+    totalRevenue: rev,
     outstandingBalance: outstandingBalance[0]?.total || 0,
+    collectionRate,
   };
 }
 
@@ -118,6 +129,33 @@ export default async function AdminDashboard() {
             </div>
             <p className="text-2xl font-bold text-gray-900 leading-none mb-1">{formatCurrency(stats.outstandingBalance)}</p>
             <p className="text-gray-400 text-xs">Across all active contracts</p>
+          </div>
+        </div>
+
+        {/* ── Collection Rate + Bulk Actions ── */}
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between rounded-2xl bg-white border border-gray-100 shadow-sm px-5 py-4">
+          <div className="flex items-center gap-5">
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-0.5">Collection Rate</p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-black text-gray-900">{stats.collectionRate}%</span>
+                <span className="text-xs text-gray-400">of total contract value collected</span>
+              </div>
+              <div className="mt-2 h-2 w-48 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{
+                    width: `${stats.collectionRate}%`,
+                    background: stats.collectionRate >= 80 ? "#16a34a" : stats.collectionRate >= 50 ? "#f59e0b" : "#dc2626",
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-3 items-center">
+            <BulkActions />
+            <ExportButton href="/api/export/payments" label="Export Payments" />
+            <ExportButton href="/api/export/customers" label="Export Customers" />
           </div>
         </div>
 

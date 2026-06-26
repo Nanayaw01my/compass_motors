@@ -41,6 +41,16 @@ export async function POST(req: NextRequest) {
     const contractNumber = generateContractNumber(seq);
     const balance = sellingPrice - dp;
 
+    const contractStart = startDate ? new Date(startDate) : new Date();
+    let nextPaymentDate: Date | undefined;
+    if (weeklyInstallment) {
+      nextPaymentDate = new Date(contractStart);
+      nextPaymentDate.setDate(nextPaymentDate.getDate() + 7);
+    } else if (monthlyInstallment) {
+      nextPaymentDate = new Date(contractStart);
+      nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
+    }
+
     const contract = await Contract.create({
       contractNumber,
       customer,
@@ -53,7 +63,8 @@ export async function POST(req: NextRequest) {
       monthlyInstallment,
       totalPaid: dp,
       remainingBalance: balance,
-      startDate: startDate ? new Date(startDate) : new Date(),
+      startDate: contractStart,
+      nextPaymentDate,
       status: "active",
     });
 
