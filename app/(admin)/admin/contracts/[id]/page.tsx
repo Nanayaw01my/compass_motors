@@ -109,10 +109,26 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
                   <Progress value={progress} className="flex-1" />
                   <span className="text-sm font-bold text-gray-700">{progress}%</span>
                 </div>
-                <div className="flex justify-between text-xs text-gray-400 mt-1">
+                <div className="flex justify-between text-xs text-gray-400 mt-1 mb-4">
                   <span>Started: {formatDate(contract.startDate)}</span>
                   <span>Progress: {formatCurrency(contract.totalPaid)} / {formatCurrency(contract.sellingPrice)}</span>
                 </div>
+
+                {/* SMS Reminder — always visible if customer has a phone */}
+                {customer?.phone && (
+                  <div className="pt-4 border-t border-gray-100">
+                    <p className="text-xs text-gray-400 mb-2">
+                      Send SMS to <span className="font-medium text-gray-600">{customer.phone}</span>
+                    </p>
+                    <SendReminderButton
+                      phone={customer.phone}
+                      name={customer.fullName}
+                      installmentAmount={contract.weeklyInstallment || contract.monthlyInstallment}
+                      remainingBalance={contract.remainingBalance}
+                      contractStatus={contract.status}
+                    />
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -141,34 +157,17 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
             </Card>
           </div>
 
-          {/* Right column: Record Payment + Reminders */}
-          <div className="space-y-4">
-            {contract.status === "active" && (
+          {/* Right column: Record Payment */}
+          {contract.status === "active" && (
+            <div>
               <RecordPaymentForm
                 contractId={contract._id}
                 remainingBalance={contract.remainingBalance}
                 weeklyAmount={contract.weeklyInstallment}
                 monthlyAmount={contract.monthlyInstallment}
               />
-            )}
-
-            {/* SMS Reminders — available for active and overdue contracts */}
-            {["active", "overdue"].includes(contract.status) && customer?.phone && (
-              <div className="rounded-xl border border-gray-200 bg-white p-4">
-                <p className="text-sm font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                  SMS Reminders
-                </p>
-                <p className="text-xs text-gray-400 mb-3">{customer.phone}</p>
-                <SendReminderButton
-                  phone={customer.phone}
-                  name={customer.fullName}
-                  installmentAmount={contract.weeklyInstallment || contract.monthlyInstallment}
-                  remainingBalance={contract.remainingBalance}
-                  contractStatus={contract.status}
-                />
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </>
