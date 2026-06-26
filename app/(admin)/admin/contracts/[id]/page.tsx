@@ -10,6 +10,7 @@ import Payment from "@/lib/db/models/Payment";
 import { formatCurrency, formatDate, formatDateTime, calculateProgress } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { RecordPaymentForm } from "@/components/admin/RecordPaymentForm";
+import { SendReminderButton } from "@/components/admin/SendReminderButton";
 import Link from "next/link";
 import { Users, Bike, CreditCard } from "lucide-react";
 
@@ -140,17 +141,34 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
             </Card>
           </div>
 
-          {/* Record Payment */}
-          {contract.status === "active" && (
-            <div>
+          {/* Right column: Record Payment + Reminders */}
+          <div className="space-y-4">
+            {contract.status === "active" && (
               <RecordPaymentForm
                 contractId={contract._id}
                 remainingBalance={contract.remainingBalance}
                 weeklyAmount={contract.weeklyInstallment}
                 monthlyAmount={contract.monthlyInstallment}
               />
-            </div>
-          )}
+            )}
+
+            {/* SMS Reminders — available for active and overdue contracts */}
+            {["active", "overdue"].includes(contract.status) && customer?.phone && (
+              <div className="rounded-xl border border-gray-200 bg-white p-4">
+                <p className="text-sm font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                  SMS Reminders
+                </p>
+                <p className="text-xs text-gray-400 mb-3">{customer.phone}</p>
+                <SendReminderButton
+                  phone={customer.phone}
+                  name={customer.fullName}
+                  installmentAmount={contract.weeklyInstallment || contract.monthlyInstallment}
+                  remainingBalance={contract.remainingBalance}
+                  contractStatus={contract.status}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </>
