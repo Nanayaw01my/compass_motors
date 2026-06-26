@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { SplashScreen } from "@/components/shared/SplashScreen";
+import { Logo } from "@/components/shared/Logo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -75,20 +76,7 @@ export default function LoginPage() {
           {/* Content */}
           <div className="relative z-10 flex flex-col h-full px-12 py-12 justify-between">
             {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg" style={{ background: "#b91c1c" }}>
-                <svg viewBox="0 0 32 32" fill="none" className="w-6 h-6">
-                  <circle cx="8" cy="22" r="4" fill="white" />
-                  <circle cx="24" cy="22" r="4" fill="white" />
-                  <path d="M8 22 L16 9 L24 22" stroke="white" strokeWidth="2.5" fill="none" strokeLinejoin="round" />
-                  <circle cx="16" cy="9" r="2" fill="white" />
-                </svg>
-              </div>
-              <div className="leading-tight">
-                <div className="text-white font-bold text-base tracking-tight">Compass Motors</div>
-                <div className="text-red-500/70 text-[11px] tracking-widest uppercase">Management Platform</div>
-              </div>
-            </div>
+            <Logo white size="md" />
 
             {/* Main copy */}
             <div>
@@ -147,21 +135,10 @@ export default function LoginPage() {
 
           {/* Mobile top bar */}
           <div
-            className="lg:hidden flex items-center gap-3 px-6 pt-12 pb-8"
+            className="lg:hidden flex items-center px-6 pt-12 pb-8"
             style={{ background: "linear-gradient(160deg, #1a0505 0%, #111010 100%)" }}
           >
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#b91c1c" }}>
-              <svg viewBox="0 0 32 32" fill="none" className="w-5 h-5">
-                <circle cx="8" cy="22" r="4" fill="white" />
-                <circle cx="24" cy="22" r="4" fill="white" />
-                <path d="M8 22 L16 9 L24 22" stroke="white" strokeWidth="2.5" fill="none" strokeLinejoin="round" />
-                <circle cx="16" cy="9" r="2" fill="white" />
-              </svg>
-            </div>
-            <div className="leading-tight">
-              <div className="text-white font-bold text-sm tracking-tight">Compass Motors</div>
-              <div className="text-red-400/70 text-[10px] tracking-widest uppercase">Management Platform</div>
-            </div>
+            <Logo white size="sm" />
           </div>
 
           {/* Form container */}
@@ -173,16 +150,8 @@ export default function LoginPage() {
 
                 {/* Card header */}
                 <div className="px-8 pt-8 pb-6 border-b border-gray-100">
-                  <div className="hidden lg:flex items-center gap-2.5 mb-6">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "#b91c1c" }}>
-                      <svg viewBox="0 0 32 32" fill="none" className="w-4.5 h-4.5">
-                        <circle cx="8" cy="22" r="4" fill="white" />
-                        <circle cx="24" cy="22" r="4" fill="white" />
-                        <path d="M8 22 L16 9 L24 22" stroke="white" strokeWidth="2.5" fill="none" strokeLinejoin="round" />
-                        <circle cx="16" cy="9" r="2" fill="white" />
-                      </svg>
-                    </div>
-                    <span className="text-gray-900 font-bold text-sm tracking-tight">Compass Motors</span>
+                  <div className="hidden lg:flex mb-6">
+                    <Logo size="sm" />
                   </div>
                   <h2 className="text-[1.6rem] font-bold text-gray-900 tracking-tight leading-tight">Welcome back</h2>
                   <p className="text-gray-400 text-sm mt-1">Sign in to your account to continue</p>

@@ -8,6 +8,7 @@ import {
   LayoutDashboard, Users, Bike, FileText, CreditCard,
   BarChart3, Settings, LogOut, Menu, X, FileBarChart
 } from "lucide-react";
+import { Logo } from "@/components/shared/Logo";
 
 const navItems = [
   { href: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -45,20 +46,7 @@ export function AdminSidebar() {
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="px-5 py-5 border-b border-white/[0.06]">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center shrink-0 shadow-lg shadow-red-900/40">
-            <svg viewBox="0 0 32 32" fill="none" className="w-5 h-5">
-              <circle cx="8" cy="22" r="4" fill="white" />
-              <circle cx="24" cy="22" r="4" fill="white" />
-              <path d="M8 22 L16 9 L24 22" stroke="white" strokeWidth="2.5" fill="none" strokeLinejoin="round" />
-              <circle cx="16" cy="9" r="2" fill="white" />
-            </svg>
-          </div>
-          <div className="leading-tight">
-            <div className="text-white font-bold text-sm tracking-tight">Compass Motors</div>
-            <div className="text-red-300 text-[10px] tracking-wider uppercase">Admin Panel</div>
-          </div>
-        </div>
+        <Logo white size="sm" />
       </div>
 
       {/* Nav */}
