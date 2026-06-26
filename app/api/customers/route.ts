@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db/connect";
 import Customer from "@/lib/db/models/Customer";
 import { auth } from "@/lib/auth";
-import { generateCustomerId, generateTemporaryPassword } from "@/lib/utils";
+import { generateCustomerId } from "@/lib/utils";
 import { getNextSequence } from "@/lib/db/counter";
 import { sendWelcomeSMS } from "@/lib/arkesel";
 import bcrypt from "bcryptjs";
@@ -17,9 +17,12 @@ export async function POST(req: NextRequest) {
     await connectDB();
     const body = await req.json();
 
-    const { fullName, phone } = body;
+    const { fullName, phone, password } = body;
     if (!fullName || !phone) {
       return NextResponse.json({ error: "Full name and phone are required" }, { status: 400 });
+    }
+    if (!password || password.length < 4) {
+      return NextResponse.json({ error: "Password must be at least 4 characters" }, { status: 400 });
     }
 
     const existing = await Customer.findOne({ phone });
@@ -29,8 +32,7 @@ export async function POST(req: NextRequest) {
 
     const seq = await getNextSequence("customer");
     const customerId = generateCustomerId(seq);
-    const tempPassword = generateTemporaryPassword();
-    const hashedPassword = await bcrypt.hash(tempPassword, 12);
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     const customer = await Customer.create({
       ...body,
@@ -41,13 +43,13 @@ export async function POST(req: NextRequest) {
     });
 
     // Send SMS (non-blocking)
-    sendWelcomeSMS(phone, fullName, phone, tempPassword).catch(console.error);
+    sendWelcomeSMS(phone, fullName, phone, password).catch(console.error);
 
     return NextResponse.json({
       success: true,
       customerId,
       username: phone,
-      password: tempPassword,
+      password,
       _id: customer._id,
     }, { status: 201 });
   } catch (error: any) {

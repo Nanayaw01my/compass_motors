@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ImageUpload } from "@/components/shared/ImageUpload";
-import { User, Phone, MapPin, CreditCard, AlertCircle, Shield, CheckCircle } from "lucide-react";
+import { User, Phone, MapPin, CreditCard, AlertCircle, Shield, CheckCircle, Eye, EyeOff } from "lucide-react";
 
 const SECTIONS = ["Personal Info", "Identification", "Emergency Contact", "Guarantor"];
 
@@ -21,6 +21,7 @@ export function NewCustomerForm() {
 
   const [form, setForm] = useState({
     fullName: "", phone: "", altPhone: "", email: "",
+    password: "",
     dateOfBirth: "", gender: "", occupation: "",
     residentialAddress: "", gpsAddress: "",
     ghanaCardNumber: "", ghanaCardFront: "", ghanaCardBack: "", passportPhoto: "",
@@ -28,6 +29,7 @@ export function NewCustomerForm() {
     guarantorName: "", guarantorPhone: "", guarantorAddress: "",
     guarantorOccupation: "", guarantorGhanaCard: "", guarantorPhoto: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const set = (field: string, value: string) => setForm((f) => ({ ...f, [field]: value }));
 
@@ -129,6 +131,27 @@ export function NewCustomerForm() {
               <div><Label>Phone Number *</Label><Input value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="0244123456" className="mt-1" type="tel" required /></div>
               <div><Label>Alternative Phone</Label><Input value={form.altPhone} onChange={(e) => set("altPhone", e.target.value)} placeholder="0551234567" className="mt-1" type="tel" /></div>
               <div><Label>Email Address</Label><Input value={form.email} onChange={(e) => set("email", e.target.value)} placeholder="kwame@email.com" className="mt-1" type="email" /></div>
+              <div className="sm:col-span-2">
+                <Label>Password *</Label>
+                <div className="relative mt-1">
+                  <Input
+                    value={form.password}
+                    onChange={(e) => set("password", e.target.value)}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Set a password for this customer"
+                    className="pr-10"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                <p className="text-xs text-gray-400 mt-1">Tip: use their phone number as a simple default password</p>
+              </div>
               <div><Label>Date of Birth</Label><Input value={form.dateOfBirth} onChange={(e) => set("dateOfBirth", e.target.value)} className="mt-1" type="date" /></div>
               <div>
                 <Label>Gender</Label>
@@ -226,6 +249,10 @@ export function NewCustomerForm() {
           <Button onClick={() => {
             if (step === 0 && (!form.fullName || !form.phone)) {
               setError("Please fill in Name and Phone Number");
+              return;
+            }
+            if (step === 0 && !form.password) {
+              setError("Please set a password for the customer");
               return;
             }
             setError("");
