@@ -16,6 +16,10 @@ export async function POST(req: NextRequest) {
     const session = await auth();
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET || !process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) {
+      return NextResponse.json({ error: "Image uploads are not configured. Please contact the administrator." }, { status: 503 });
+    }
+
     const formData = await req.formData();
     const file   = formData.get("file") as File | null;
     const folder = (formData.get("folder") as string | null) ?? "general";
