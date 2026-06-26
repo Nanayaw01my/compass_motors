@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
 import { validateEnv } from "@/lib/env";
 
 interface MongooseCache {
@@ -15,26 +14,26 @@ declare global {
 const cached: MongooseCache = global.mongoose ?? { conn: null, promise: null, seeded: false };
 if (!global.mongoose) global.mongoose = cached;
 
+// Pre-computed bcrypt hash of "ADMIN123" with 10 rounds — avoids slow hashing at startup
+const ADMIN_DEFAULT_HASH = "$2b$10$fQuymC5srcgkPG1pyr1b2OzTwoKFKyzjz2LZhR01pZcMu4vxNyQq.";
+
 async function seedAdmin() {
   if (cached.seeded) return;
   cached.seeded = true;
   try {
     const Admin = (await import("@/lib/db/models/Admin")).default;
-    const password = await bcrypt.hash("ADMIN123", 12);
-    // Upsert: update existing admin or create new one
-    await Admin.findOneAndUpdate(
-      { $or: [{ username: "admin" }, { email: "cmsspass@gmail.com" }] },
-      {
+    const exists = await Admin.exists({ $or: [{ username: "admin" }, { email: "cmsspass@gmail.com" }] });
+    if (!exists) {
+      await Admin.create({
         name: "Compass Motors Admin",
         username: "admin",
         email: "cmsspass@gmail.com",
-        password,
+        password: ADMIN_DEFAULT_HASH,
         phone: "0593920144",
         role: "admin",
-      },
-      { upsert: true, new: true }
-    );
-    console.log("Admin account ready.");
+      });
+      console.log("Admin account created.");
+    }
   } catch (e) {
     console.error("Auto-seed failed:", e);
   }
@@ -55,6 +54,7 @@ export async function connectDB() {
   }
 
   cached.conn = await cached.promise;
-  await seedAdmin();
+  // Fire seed in background — don't block the request path
+  seedAdmin().catch(console.error);
   return cached.conn;
 }

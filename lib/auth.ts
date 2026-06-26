@@ -33,12 +33,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             { username: username.toLowerCase() },
             { email: username.toLowerCase() },
           ],
-        });
+        }).lean();
         if (admin) {
           const isValid = await bcrypt.compare(password, admin.password);
           if (!isValid) return null;
           return {
-            id: admin._id.toString(),
+            id: (admin._id as any).toString(),
             name: admin.name,
             email: admin.email,
             role: "admin",
@@ -46,17 +46,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         // Try customer (phone number as username)
-        const customer = await Customer.findOne({ username });
+        const customer = await Customer.findOne({ username }).lean();
         if (!customer) return null;
-        if (customer.status === "suspended") throw new Error("Account suspended");
-        const isValid = await bcrypt.compare(password, customer.password);
+        if ((customer as any).status === "suspended") throw new Error("Account suspended");
+        const isValid = await bcrypt.compare(password, (customer as any).password);
         if (!isValid) return null;
         return {
-          id: customer._id.toString(),
-          name: customer.fullName,
-          email: customer.email || "",
+          id: (customer._id as any).toString(),
+          name: (customer as any).fullName,
+          email: (customer as any).email || "",
           role: "customer",
-          customerId: customer.customerId,
+          customerId: (customer as any).customerId,
         };
       },
     }),
