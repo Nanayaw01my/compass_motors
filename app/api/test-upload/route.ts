@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { v2 as cloudinary } from "cloudinary";
+import crypto from "crypto";
 
 // Temporary diagnostic endpoint — remove after fixing uploads
 export async function GET() {
@@ -8,23 +8,48 @@ export async function GET() {
   const apiKey = process.env.CLOUDINARY_API_KEY;
   const apiSecret = process.env.CLOUDINARY_API_SECRET;
 
+  let resolvedCloudName = cloudName || "";
+  let resolvedApiKey = apiKey || "";
+  let resolvedApiSecret = apiSecret || "";
+
+  if (url) {
+    const match = url.match(/^cloudinary:\/\/([^:]+):([^@]+)@(.+)$/);
+    if (match) {
+      resolvedApiKey = match[1];
+      resolvedApiSecret = match[2];
+      resolvedCloudName = match[3];
+    }
+  }
+
   const config = {
-    hasUrl: !!url,
-    urlPreview: url ? url.slice(0, 30) + "..." : null,
-    cloudName: cloudName || null,
-    apiKeyPrefix: apiKey ? apiKey.slice(0, 6) + "..." : null,
-    apiSecretLength: apiSecret ? apiSecret.length : null,
+    source: url ? "CLOUDINARY_URL" : "individual vars",
+    cloudName: resolvedCloudName || "MISSING",
+    apiKeyPrefix: resolvedApiKey ? resolvedApiKey.slice(0, 6) + "..." : "MISSING",
+    apiSecretLength: resolvedApiSecret ? resolvedApiSecret.length : 0,
   };
 
+  if (!resolvedCloudName || !resolvedApiKey || !resolvedApiSecret) {
+    return NextResponse.json({ ok: false, error: "Missing credentials", config });
+  }
+
+  // Try a simple signed API call to verify credentials
   try {
-    if (url) {
-      // CLOUDINARY_URL auto-configures the SDK
-    } else {
-      cloudinary.config({ cloud_name: cloudName, api_key: apiKey, api_secret: apiSecret });
-    }
-    const result = await cloudinary.api.ping();
-    return NextResponse.json({ ok: true, ping: result, config });
+    const timestamp = String(Math.round(Date.now() / 1000));
+    const str = `timestamp=${timestamp}${resolvedApiSecret}`;
+    const signature = crypto.createHash("sha256").update(str).digest("hex");
+
+    const form = new FormData();
+    form.append("timestamp", timestamp);
+    form.append("api_key", resolvedApiKey);
+    form.append("signature", signature);
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${resolvedCloudName}/resources/image?max_results=1`, {
+      headers: { Authorization: `Basic ${Buffer.from(`${resolvedApiKey}:${resolvedApiSecret}`).toString("base64")}` },
+    });
+
+    const body = await res.text();
+    return NextResponse.json({ ok: res.ok, status: res.status, body: body.slice(0, 200), config });
   } catch (err: any) {
-    return NextResponse.json({ ok: false, error: err.message, config }, { status: 500 });
+    return NextResponse.json({ ok: false, error: err.message, config });
   }
 }
