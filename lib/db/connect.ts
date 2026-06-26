@@ -2,10 +2,6 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import { validateEnv } from "@/lib/env";
 
-validateEnv();
-
-const MONGODB_URI = process.env.MONGODB_URI!;
-
 interface MongooseCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
@@ -45,6 +41,11 @@ async function seedAdmin() {
 }
 
 export async function connectDB() {
+  validateEnv();
+
+  const MONGODB_URI = process.env.MONGODB_URI!;
+  if (!MONGODB_URI) throw new Error("MONGODB_URI is not defined");
+
   if (cached.conn) return cached.conn;
 
   if (!cached.promise) {

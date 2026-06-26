@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export default auth(function middleware(req: NextRequest & { auth: any }) {
+export const proxy = auth(function proxy(req: NextRequest & { auth: any }) {
   const { pathname } = req.nextUrl;
   const session = req.auth;
   const role = session?.user ? (session.user as any).role : null;
