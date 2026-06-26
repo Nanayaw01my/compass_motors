@@ -13,14 +13,17 @@ export interface IAdmin extends Document {
 
 const AdminSchema = new Schema<IAdmin>(
   {
-    name: { type: String, required: true },
-    username: { type: String, unique: true, sparse: true, lowercase: true },
-    email: { type: String, required: true, unique: true, lowercase: true },
-    password: { type: String, required: true },
-    phone: { type: String },
-    role: { type: String, default: "admin" },
+    name:     { type: String, required: true, trim: true },
+    username: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    email:    { type: String, required: true, unique: true, lowercase: true, trim: true },
+    password: { type: String, required: true, minlength: 6 },
+    phone:    { type: String, trim: true },
+    role:     { type: String, default: "admin", immutable: true },
   },
   { timestamps: true }
 );
+
+AdminSchema.index({ username: 1 });
+AdminSchema.index({ email: 1 });
 
 export default mongoose.models.Admin || mongoose.model<IAdmin>("Admin", AdminSchema);

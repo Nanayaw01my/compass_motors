@@ -5,9 +5,7 @@ export interface IPayment extends Document {
   contract: Types.ObjectId;
   customer: Types.ObjectId;
   amount: number;
-  paymentMethod: "paystack" | "cash" | "mobile-money" | "bank-transfer";
-  paystackReference?: string;
-  paystackStatus?: string;
+  paymentMethod: "cash" | "mobile-money" | "bank-transfer";
   balanceBefore: number;
   balanceAfter: number;
   notes?: string;
@@ -20,23 +18,28 @@ export interface IPayment extends Document {
 const PaymentSchema = new Schema<IPayment>(
   {
     receiptNumber: { type: String, required: true, unique: true },
-    contract: { type: Schema.Types.ObjectId, ref: "Contract", required: true },
-    customer: { type: Schema.Types.ObjectId, ref: "Customer", required: true },
-    amount: { type: Number, required: true },
+    contract:      { type: Schema.Types.ObjectId, ref: "Contract", required: true },
+    customer:      { type: Schema.Types.ObjectId, ref: "Customer", required: true },
+    amount:        { type: Number, required: true, min: 0.01 },
     paymentMethod: {
       type: String,
-      enum: ["paystack", "cash", "mobile-money", "bank-transfer"],
+      enum: ["cash", "mobile-money", "bank-transfer"],
       required: true,
     },
-    paystackReference: String,
-    paystackStatus: String,
-    balanceBefore: { type: Number, required: true },
-    balanceAfter: { type: Number, required: true },
-    notes: String,
-    recordedBy: { type: Schema.Types.ObjectId, ref: "Admin" },
-    status: { type: String, enum: ["pending", "successful", "failed"], default: "pending" },
+    balanceBefore: { type: Number, required: true, min: 0 },
+    balanceAfter:  { type: Number, required: true, min: 0 },
+    notes:         String,
+    recordedBy:    { type: Schema.Types.ObjectId, ref: "Admin" },
+    status:        { type: String, enum: ["pending", "successful", "failed"], default: "successful" },
   },
   { timestamps: true }
 );
+
+PaymentSchema.index({ contract: 1 });
+PaymentSchema.index({ customer: 1 });
+PaymentSchema.index({ customer: 1, status: 1 });
+PaymentSchema.index({ contract: 1, status: 1 });
+PaymentSchema.index({ createdAt: -1 });
+PaymentSchema.index({ receiptNumber: 1 });
 
 export default mongoose.models.Payment || mongoose.model<IPayment>("Payment", PaymentSchema);

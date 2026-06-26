@@ -23,20 +23,20 @@ export interface IContract extends Document {
 
 const ContractSchema = new Schema<IContract>(
   {
-    contractNumber: { type: String, required: true, unique: true },
-    customer: { type: Schema.Types.ObjectId, ref: "Customer", required: true },
-    motorcycle: { type: Schema.Types.ObjectId, ref: "Motorcycle", required: true },
-    contractType: { type: String, enum: ["installment", "work-and-pay"], required: true },
-    sellingPrice: { type: Number, required: true },
-    downPayment: { type: Number, default: 0 },
-    balance: { type: Number, required: true },
-    weeklyInstallment: Number,
-    monthlyInstallment: Number,
-    totalPaid: { type: Number, default: 0 },
-    remainingBalance: { type: Number, required: true },
-    startDate: { type: Date, required: true },
-    endDate: Date,
-    nextPaymentDate: Date,
+    contractNumber:    { type: String, required: true, unique: true },
+    customer:          { type: Schema.Types.ObjectId, ref: "Customer", required: true },
+    motorcycle:        { type: Schema.Types.ObjectId, ref: "Motorcycle", required: true },
+    contractType:      { type: String, enum: ["installment", "work-and-pay"], required: true },
+    sellingPrice:      { type: Number, required: true, min: 0 },
+    downPayment:       { type: Number, default: 0, min: 0 },
+    balance:           { type: Number, required: true, min: 0 },
+    weeklyInstallment: { type: Number, min: 0 },
+    monthlyInstallment:{ type: Number, min: 0 },
+    totalPaid:         { type: Number, default: 0, min: 0 },
+    remainingBalance:  { type: Number, required: true, min: 0 },
+    startDate:         { type: Date, required: true },
+    endDate:           Date,
+    nextPaymentDate:   Date,
     status: {
       type: String,
       enum: ["active", "completed", "overdue", "suspended", "cancelled"],
@@ -46,5 +46,12 @@ const ContractSchema = new Schema<IContract>(
   },
   { timestamps: true }
 );
+
+ContractSchema.index({ customer: 1 });
+ContractSchema.index({ status: 1 });
+ContractSchema.index({ customer: 1, status: 1 });
+ContractSchema.index({ motorcycle: 1 });
+ContractSchema.index({ createdAt: -1 });
+ContractSchema.index({ contractNumber: 1 });
 
 export default mongoose.models.Contract || mongoose.model<IContract>("Contract", ContractSchema);
