@@ -2,6 +2,7 @@ import React from "react";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AdminSettingsForm } from "@/components/admin/AdminSettingsForm";
+import { ClearDataButton } from "@/components/admin/ClearDataButton";
 import { connectDB } from "@/lib/db/connect";
 import Admin from "@/lib/db/models/Admin";
 import { auth } from "@/lib/auth";
@@ -39,6 +40,19 @@ export default async function SettingsPage() {
         </Card>
 
         {admin && <AdminSettingsForm admin={admin} />}
+
+        {/* Danger Zone */}
+        <Card className="border-red-200">
+          <CardHeader>
+            <CardTitle className="text-red-600 text-base">Danger Zone</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-gray-500 mb-4">
+              Permanently delete all customers, contracts, payments, and motorcycles. The admin account will be preserved.
+            </p>
+            <ClearDataButton />
+          </CardContent>
+        </Card>
       </div>
     </>
   );
