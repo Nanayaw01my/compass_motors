@@ -2,7 +2,13 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 
 export default async function HomePage() {
-  const session = await auth();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let session: any = null;
+  try {
+    session = await auth();
+  } catch {
+    redirect("/login");
+  }
 
   if (!session) redirect("/login");
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { connectDB } from "@/lib/db/connect";
@@ -74,7 +74,9 @@ export default async function ContractsPage({
               <Plus className="w-4 h-4" /><span className="hidden sm:inline">New Contract</span><span className="sm:hidden">New</span>
             </Link>
           </div>
-          <ContractSearch />
+          <Suspense fallback={<div className="h-10" />}>
+            <ContractSearch />
+          </Suspense>
         </div>
 
         {contracts.length === 0 ? (

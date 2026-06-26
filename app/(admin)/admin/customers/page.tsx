@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { connectDB } from "@/lib/db/connect";
@@ -47,7 +47,9 @@ export default async function CustomersPage({
             <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-gray-300" />{customers.length - activeCount} other</span>
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
-            <CustomerSearch />
+            <Suspense fallback={<div className="h-10 w-48" />}>
+              <CustomerSearch />
+            </Suspense>
             <Link href="/admin/customers/new" className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors shrink-0">
               <Plus className="w-4 h-4" /><span className="hidden sm:inline">Register</span><span className="sm:hidden">New</span>
             </Link>
