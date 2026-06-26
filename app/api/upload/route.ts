@@ -16,9 +16,14 @@ export async function POST(req: NextRequest) {
     const session = await auth();
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET || !process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) {
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const apiKey = process.env.CLOUDINARY_API_KEY;
+    const apiSecret = process.env.CLOUDINARY_API_SECRET;
+    if (!apiKey || !apiSecret || !cloudName) {
+      logger.error("Cloudinary env vars missing", { cloudName: !!cloudName, apiKey: !!apiKey, apiSecret: !!apiSecret });
       return NextResponse.json({ error: "Image uploads are not configured. Please contact the administrator." }, { status: 503 });
     }
+    logger.info("Cloudinary config", { cloudName, apiKeyPrefix: apiKey.slice(0, 6) });
 
     const formData = await req.formData();
     const file   = formData.get("file") as File | null;
