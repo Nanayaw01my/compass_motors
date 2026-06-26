@@ -6,7 +6,7 @@ import Motorcycle from "@/lib/db/models/Motorcycle";
 import Contract from "@/lib/db/models/Contract";
 import Payment from "@/lib/db/models/Payment";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { Users, Bike, FileText, CreditCard, TrendingUp, AlertCircle, CheckCircle, ArrowUpRight } from "lucide-react";
+import { Users, Bike, FileText, CreditCard, TrendingUp, AlertCircle, CheckCircle, ArrowRight, Clock } from "lucide-react";
 import Link from "next/link";
 import { AdminDashboardChart } from "@/components/admin/AdminDashboardChart";
 import { BulkActions } from "@/components/admin/BulkActions";
@@ -80,7 +80,6 @@ async function getMonthlyChartData() {
 
 export default async function AdminDashboard() {
   const [stats, chartData] = await Promise.all([getDashboardStats(), getMonthlyChartData()]);
-
   const today = new Date().toLocaleDateString("en-GH", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
 
   return (
@@ -89,157 +88,147 @@ export default async function AdminDashboard() {
 
       <div className="p-4 sm:p-6 space-y-5">
 
-        {/* ── Primary KPIs ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {/* Total Revenue */}
-          <div className="sm:col-span-1 rounded-2xl p-5 text-white relative overflow-hidden" style={{ background: "linear-gradient(135deg, #DC2626 0%, #991b1b 100%)" }}>
-            <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-10" style={{ background: "white", transform: "translate(30%, -30%)" }} />
-            <div className="absolute bottom-0 left-0 w-20 h-20 rounded-full opacity-10" style={{ background: "white", transform: "translate(-30%, 30%)" }} />
-            <div className="relative">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-red-200 text-xs font-medium uppercase tracking-wider">Total Revenue</p>
-                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
-                  <TrendingUp className="w-4 h-4 text-white" />
+        {/* ── Hero Banner ── */}
+        <div className="relative rounded-3xl overflow-hidden" style={{ background: "linear-gradient(135deg, #DC2626 0%, #7f1d1d 100%)" }}>
+          {/* Decorative circles */}
+          <div className="absolute -top-10 -right-10 w-52 h-52 rounded-full bg-white/5" />
+          <div className="absolute -bottom-8 -left-8 w-40 h-40 rounded-full bg-white/5" />
+          <div className="absolute top-4 right-32 w-16 h-16 rounded-full bg-white/10" />
+
+          <div className="relative p-6 sm:p-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+              {/* Revenue */}
+              <div>
+                <p className="text-red-200 text-xs font-bold uppercase tracking-widest mb-2">Total Revenue Collected</p>
+                <p className="text-4xl sm:text-5xl font-black text-white leading-none tracking-tight">
+                  {formatCurrency(stats.totalRevenue)}
+                </p>
+                <div className="flex items-center gap-4 mt-4">
+                  <div className="bg-white/15 rounded-2xl px-4 py-2.5">
+                    <p className="text-red-100 text-xs font-semibold">This Month</p>
+                    <p className="text-white text-lg font-black">{formatCurrency(stats.monthlyCollection)}</p>
+                  </div>
+                  <div className="bg-white/15 rounded-2xl px-4 py-2.5">
+                    <p className="text-red-100 text-xs font-semibold">This Week</p>
+                    <p className="text-white text-lg font-black">{formatCurrency(stats.weeklyCollection)}</p>
+                  </div>
                 </div>
               </div>
-              <p className="text-3xl font-bold leading-none mb-1">{formatCurrency(stats.totalRevenue)}</p>
-              <p className="text-red-200 text-xs">All time collections</p>
-            </div>
-          </div>
 
-          {/* Monthly Collection */}
-          <div className="rounded-2xl p-5 bg-white border border-gray-100 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-gray-500 text-xs font-medium uppercase tracking-wider">This Month</p>
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-                <CreditCard className="w-4 h-4 text-emerald-600" />
+              {/* Collection Rate */}
+              <div className="sm:text-right">
+                <p className="text-red-200 text-xs font-bold uppercase tracking-widest mb-1">Collection Rate</p>
+                <p className="text-5xl sm:text-6xl font-black text-white leading-none">{stats.collectionRate}<span className="text-2xl text-red-300">%</span></p>
+                <div className="mt-3 h-2.5 w-full sm:w-48 bg-white/20 rounded-full overflow-hidden ml-auto">
+                  <div
+                    className="h-full rounded-full bg-white transition-all"
+                    style={{ width: `${stats.collectionRate}%` }}
+                  />
+                </div>
+                <p className="text-red-200 text-xs mt-1.5 font-medium">of total contract value</p>
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900 leading-none mb-1">{formatCurrency(stats.monthlyCollection)}</p>
-            <p className="text-gray-400 text-xs">Week: {formatCurrency(stats.weeklyCollection)}</p>
-          </div>
-
-          {/* Outstanding */}
-          <div className="rounded-2xl p-5 bg-white border border-gray-100 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-gray-500 text-xs font-medium uppercase tracking-wider">Outstanding</p>
-              <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
-                <AlertCircle className="w-4 h-4 text-amber-500" />
-              </div>
-            </div>
-            <p className="text-2xl font-bold text-gray-900 leading-none mb-1">{formatCurrency(stats.outstandingBalance)}</p>
-            <p className="text-gray-400 text-xs">Across all active contracts</p>
           </div>
         </div>
 
-        {/* ── Collection Rate + Bulk Actions ── */}
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between rounded-2xl bg-white border border-gray-100 shadow-sm px-5 py-4">
-          <div className="flex items-center gap-5">
+        {/* ── Key Stats Grid ── */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          {[
+            { label: "Active Contracts", value: stats.activeContracts, icon: FileText, accent: "#3b82f6", bg: "#eff6ff", href: "/admin/contracts" },
+            { label: "Overdue", value: stats.overdueContracts, icon: AlertCircle, accent: "#dc2626", bg: "#fef2f2", href: "/admin/contracts?status=overdue" },
+            { label: "Completed", value: stats.completedContracts, icon: CheckCircle, accent: "#16a34a", bg: "#f0fdf4", href: "/admin/contracts?status=completed" },
+            { label: "Total Customers", value: stats.totalCustomers, icon: Users, accent: "#7c3aed", bg: "#f5f3ff", href: "/admin/customers" },
+          ].map(({ label, value, icon: Icon, accent, bg, href }) => (
+            <Link key={label} href={href}
+              className="group rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all p-4 sm:p-5 overflow-hidden relative"
+            >
+              <div className="absolute top-0 right-0 w-20 h-20 rounded-full opacity-[0.07] translate-x-6 -translate-y-6 transition-transform group-hover:scale-125"
+                style={{ background: accent }} />
+              <div className="w-10 h-10 rounded-2xl flex items-center justify-center mb-3" style={{ background: bg }}>
+                <Icon className="w-5 h-5" style={{ color: accent }} />
+              </div>
+              <p className="text-3xl sm:text-4xl font-black text-gray-900 leading-none">{value}</p>
+              <p className="text-xs font-bold text-gray-400 mt-1.5 uppercase tracking-wide">{label}</p>
+              <div className="flex items-center gap-1 mt-3 text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: accent }}>
+                View all <ArrowRight className="w-3 h-3" />
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* ── Outstanding Balance ── */}
+        <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-5 flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center shrink-0">
+              <Clock className="w-6 h-6 text-amber-500" />
+            </div>
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-0.5">Collection Rate</p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-black text-gray-900">{stats.collectionRate}%</span>
-                <span className="text-xs text-gray-400">of total contract value collected</span>
-              </div>
-              <div className="mt-2 h-2 w-48 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all"
-                  style={{
-                    width: `${stats.collectionRate}%`,
-                    background: stats.collectionRate >= 80 ? "#16a34a" : stats.collectionRate >= 50 ? "#f59e0b" : "#dc2626",
-                  }}
-                />
-              </div>
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Outstanding Balance</p>
+              <p className="text-3xl font-black text-gray-900 leading-tight">{formatCurrency(stats.outstandingBalance)}</p>
+              <p className="text-xs text-gray-400 font-medium mt-0.5">Across all active &amp; overdue contracts</p>
             </div>
           </div>
-          <div className="flex flex-wrap gap-3 items-center">
+          <div className="flex flex-wrap gap-2">
             <BulkActions />
             <ExportButton href="/api/export/payments" label="Export Payments" />
             <ExportButton href="/api/export/customers" label="Export Customers" />
           </div>
         </div>
 
-        {/* ── Operational Stats ── single card with 4 segments ── */}
-        <div className="rounded-2xl bg-white border border-gray-100 shadow-sm overflow-hidden">
-          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-gray-100">
-            {[
-              { label: "Active Contracts", value: stats.activeContracts, icon: FileText, color: "text-blue-600", bg: "bg-blue-50", href: "/admin/contracts" },
-              { label: "Overdue", value: stats.overdueContracts, icon: AlertCircle, color: "text-red-600", bg: "bg-red-50", href: "/admin/contracts" },
-              { label: "Completed", value: stats.completedContracts, icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-50", href: "/admin/contracts" },
-              { label: "Customers", value: stats.totalCustomers, icon: Users, color: "text-purple-600", bg: "bg-purple-50", href: "/admin/customers" },
-            ].map(({ label, value, icon: Icon, color, bg, href }) => (
-              <Link key={label} href={href} className="flex items-center gap-3 p-4 sm:p-5 hover:bg-gray-50 transition-colors group">
-                <div className={`w-9 h-9 rounded-xl ${bg} flex items-center justify-center shrink-0`}>
-                  <Icon className={`w-4 h-4 ${color}`} />
-                </div>
-                <div>
-                  <p className="text-xl font-bold text-gray-900 leading-none">{value}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{label}</p>
-                </div>
-                <ArrowUpRight className="w-3.5 h-3.5 text-gray-300 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Motorcycles row ── hidden on mobile, visible on desktop ── */}
-        <div className="hidden sm:grid sm:grid-cols-3 gap-4">
+        {/* ── Motorcycles ── */}
+        <div className="grid grid-cols-3 gap-3">
           {[
-            { label: "Total Bikes", value: stats.totalMotorcycles, sub: "in fleet", color: "bg-slate-50", border: "border-slate-200", text: "text-slate-700" },
-            { label: "Available", value: stats.availableMotorcycles, sub: "ready for sale", color: "bg-green-50", border: "border-green-200", text: "text-green-700" },
-            { label: "Sold", value: stats.soldMotorcycles, sub: "on contract", color: "bg-gray-50", border: "border-gray-200", text: "text-gray-700" },
-          ].map(({ label, value, sub, color, border, text }) => (
-            <Link key={label} href="/admin/motorcycles" className={`rounded-2xl p-4 ${color} border ${border} flex items-center justify-between hover:shadow-sm transition-shadow`}>
-              <div>
-                <p className={`text-2xl font-bold ${text}`}>{value}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{label}</p>
-                <p className="text-xs text-gray-400">{sub}</p>
-              </div>
-              <Bike className={`w-8 h-8 ${text} opacity-30`} />
+            { label: "Total Fleet", value: stats.totalMotorcycles, sub: "motorcycles", dot: "bg-gray-400" },
+            { label: "Available", value: stats.availableMotorcycles, sub: "ready to sell", dot: "bg-emerald-500" },
+            { label: "On Contract", value: stats.soldMotorcycles, sub: "deployed", dot: "bg-red-500" },
+          ].map(({ label, value, sub, dot }) => (
+            <Link key={label} href="/admin/motorcycles"
+              className="rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all p-4 text-center group"
+            >
+              <div className={`w-2 h-2 rounded-full ${dot} mx-auto mb-2`} />
+              <p className="text-3xl sm:text-4xl font-black text-gray-900">{value}</p>
+              <p className="text-xs font-bold text-gray-700 mt-0.5">{label}</p>
+              <p className="text-xs text-gray-400">{sub}</p>
             </Link>
           ))}
         </div>
 
         {/* ── Chart + Recent Payments ── */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-          {/* Chart */}
           <div className="lg:col-span-3 rounded-2xl bg-white border border-gray-100 shadow-sm p-5">
-            <div className="flex items-center justify-between mb-5">
-              <div>
-                <h3 className="font-semibold text-gray-900 text-sm">Revenue Overview</h3>
-                <p className="text-xs text-gray-400 mt-0.5">Last 6 months</p>
-              </div>
+            <div className="mb-4">
+              <h3 className="font-black text-gray-900 text-base">Revenue Overview</h3>
+              <p className="text-xs font-medium text-gray-400 mt-0.5">Last 6 months collections</p>
             </div>
             <AdminDashboardChart data={chartData} />
           </div>
 
-          {/* Recent Payments */}
           <div className="lg:col-span-2 rounded-2xl bg-white border border-gray-100 shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between p-5 pb-3">
+            <div className="flex items-center justify-between px-5 pt-5 pb-3">
               <div>
-                <h3 className="font-semibold text-gray-900 text-sm">Recent Payments</h3>
-                <p className="text-xs text-gray-400 mt-0.5">Latest transactions</p>
+                <h3 className="font-black text-gray-900 text-base">Recent Payments</h3>
+                <p className="text-xs font-medium text-gray-400 mt-0.5">Latest transactions</p>
               </div>
-              <Link href="/admin/payments" className="text-xs font-medium text-red-600 hover:text-red-700">
-                View all
+              <Link href="/admin/payments" className="text-xs font-black text-red-600 hover:text-red-700 flex items-center gap-1">
+                View all <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
             <div className="divide-y divide-gray-50">
               {stats.recentPayments.length === 0 ? (
-                <div className="py-10 text-center text-gray-400 text-sm">No payments yet</div>
+                <div className="py-10 text-center text-gray-400 text-sm font-medium">No payments yet</div>
               ) : (
                 stats.recentPayments.map((p: any) => (
                   <div key={p._id} className="flex items-center gap-3 px-5 py-3.5 hover:bg-gray-50 transition-colors">
-                    <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                      <span className="text-emerald-700 font-bold text-xs">
+                    <div className="w-9 h-9 rounded-full bg-red-600 flex items-center justify-center shrink-0">
+                      <span className="text-white font-black text-sm">
                         {p.customer?.fullName?.charAt(0) || "?"}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">{p.customer?.fullName}</p>
-                      <p className="text-xs text-gray-400">{formatDate(p.createdAt)}</p>
+                      <p className="text-sm font-bold text-gray-900 truncate">{p.customer?.fullName}</p>
+                      <p className="text-xs text-gray-400 font-medium">{formatDate(p.createdAt)}</p>
                     </div>
-                    <p className="text-sm font-bold text-emerald-600 shrink-0">{formatCurrency(p.amount)}</p>
+                    <p className="text-sm font-black text-emerald-600 shrink-0">{formatCurrency(p.amount)}</p>
                   </div>
                 ))
               )}
@@ -249,23 +238,23 @@ export default async function AdminDashboard() {
 
         {/* ── Quick Actions ── */}
         <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-5">
-          <h3 className="font-semibold text-gray-900 text-sm mb-4">Quick Actions</h3>
+          <h3 className="font-black text-gray-900 text-base mb-4">Quick Actions</h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { href: "/admin/customers/new", icon: Users, label: "New Customer", color: "bg-blue-600" },
-              { href: "/admin/motorcycles/new", icon: Bike, label: "Add Motorcycle", color: "bg-purple-600" },
-              { href: "/admin/contracts/new", icon: FileText, label: "New Contract", color: "bg-orange-600" },
-              { href: "/admin/payments", icon: CreditCard, label: "Record Payment", color: "bg-emerald-600" },
-            ].map(({ href, icon: Icon, label, color }) => (
-              <Link
-                key={href}
-                href={href}
-                className="flex items-center gap-3 p-3.5 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors group"
+              { href: "/admin/customers/new", icon: Users, label: "New Customer", desc: "Register customer" },
+              { href: "/admin/motorcycles/new", icon: Bike, label: "Add Motorcycle", desc: "Add to inventory" },
+              { href: "/admin/contracts/new", icon: FileText, label: "New Contract", desc: "Create agreement" },
+              { href: "/admin/payments", icon: CreditCard, label: "Record Payment", desc: "Log a payment" },
+            ].map(({ href, icon: Icon, label, desc }) => (
+              <Link key={href} href={href}
+                className="group relative rounded-2xl border-2 border-gray-100 hover:border-red-200 bg-white hover:bg-red-50 transition-all p-4 overflow-hidden"
               >
-                <div className={`w-9 h-9 rounded-xl ${color} flex items-center justify-center shrink-0`}>
-                  <Icon className="w-4 h-4 text-white" />
+                <div className="absolute top-0 right-0 w-16 h-16 rounded-full bg-red-600/5 translate-x-4 -translate-y-4 group-hover:scale-150 transition-transform" />
+                <div className="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <Icon className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">{label}</span>
+                <p className="text-sm font-black text-gray-900">{label}</p>
+                <p className="text-xs text-gray-400 font-medium mt-0.5">{desc}</p>
               </Link>
             ))}
           </div>
