@@ -36,7 +36,7 @@ async function sendSMS(to: string, message: string): Promise<SMSResult> {
 }
 
 export async function sendWelcomeSMS(phone: string, name: string, username: string, password: string) {
-  const message = `Welcome to Compass Motors, ${name}!\nYour login details:\nUsername: ${username}\nPassword: ${password}\nLogin at: compassmotors.vercel.app\nCall: 0593920144`;
+  const message = `Welcome to Compass Motors, ${name}!\nYour login details:\nUsername: ${username}\nPassword: ${password}\nLogin at: www.compassmotors.online\nCall: 0593920144`;
   return sendSMS(phone, message);
 }
 
@@ -46,7 +46,7 @@ export async function sendPaymentConfirmationSMS(phone: string, name: string, am
 }
 
 export async function sendPaymentReminderSMS(phone: string, name: string, amount: number, dueDate: string) {
-  const message = `Hi ${name}, your installment payment of GHS ${amount.toFixed(2)} is due on ${dueDate}.\nPay now at compassmotors.vercel.app\nCompass Motors: 0593920144`;
+  const message = `Hi ${name}, your installment payment of GHS ${amount.toFixed(2)} is due on ${dueDate}.\nPay now at www.compassmotors.online\nCompass Motors: 0593920144`;
   return sendSMS(phone, message);
 }
 
