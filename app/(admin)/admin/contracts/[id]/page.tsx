@@ -60,31 +60,33 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
           <div className="lg:col-span-2 space-y-4">
             <Card>
               <CardContent className="p-5">
-                <div className="flex items-start gap-4 mb-4">
+                <div className="flex items-start gap-3 mb-4">
                   {moto?.images?.[0] ? (
-                    <img src={moto.images[0]} alt="" className="w-20 h-20 rounded-xl object-cover" />
+                    <img src={moto.images[0]} alt="" className="w-16 h-16 rounded-xl object-cover shrink-0" />
                   ) : (
-                    <div className="w-20 h-20 rounded-xl bg-red-50 flex items-center justify-center">
-                      <Bike className="w-10 h-10 text-red-600" />
+                    <div className="w-16 h-16 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
+                      <Bike className="w-8 h-8 text-red-600" />
                     </div>
                   )}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="font-mono font-bold text-red-600">{contract.contractNumber}</span>
-                      <Badge variant={sc.variant}>{contract.status.charAt(0).toUpperCase() + contract.status.slice(1)}</Badge>
-                      <Badge variant="outline">{contract.contractType === "work-and-pay" ? "Work & Pay" : "Installment"}</Badge>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="font-mono font-bold text-red-600 text-sm">{contract.contractNumber}</span>
+                        <Badge variant={sc.variant}>{contract.status.charAt(0).toUpperCase() + contract.status.slice(1)}</Badge>
+                        <Badge variant="outline">{contract.contractType === "work-and-pay" ? "Work & Pay" : "Installment"}</Badge>
+                      </div>
+                      <ContractActions
+                        contractId={contract._id}
+                        status={contract.status}
+                        currentNotes={contract.notes}
+                      />
                     </div>
-                    <p className="font-bold text-gray-900 text-lg">{moto?.brand} {moto?.model} ({moto?.year})</p>
-                    <Link href={`/admin/customers/${customer?._id}`} className="text-sm text-red-600 hover:underline">
+                    <p className="font-bold text-gray-900 text-sm truncate">{moto?.brand} {moto?.model} ({moto?.year})</p>
+                    <Link href={`/admin/customers/${customer?._id}`} className="text-xs text-red-600 hover:underline block truncate">
                       {customer?.fullName} · {customer?.customerId}
                     </Link>
-                    <p className="text-sm text-gray-500">{customer?.phone}</p>
+                    <p className="text-xs text-gray-500">{customer?.phone}</p>
                   </div>
-                  <ContractActions
-                    contractId={contract._id}
-                    status={contract.status}
-                    currentNotes={contract.notes}
-                  />
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">

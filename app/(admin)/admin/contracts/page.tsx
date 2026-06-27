@@ -120,18 +120,18 @@ export default async function ContractsPage({
                         </p>
 
                         {/* Financials */}
-                        <div className="grid grid-cols-3 gap-3 mt-4">
-                          <div>
-                            <p className="text-xs text-gray-400 mb-0.5">Selling Price</p>
-                            <p className="font-bold text-gray-900 text-sm">{formatCurrency(c.sellingPrice)}</p>
+                        <div className="grid grid-cols-3 gap-2 mt-4">
+                          <div className="overflow-hidden">
+                            <p className="text-[10px] text-gray-400 mb-0.5">Selling Price</p>
+                            <p className="font-bold text-gray-900 text-xs truncate">{formatCurrency(c.sellingPrice)}</p>
                           </div>
-                          <div>
-                            <p className="text-xs text-gray-400 mb-0.5">Amount Paid</p>
-                            <p className="font-bold text-emerald-600 text-sm">{formatCurrency(c.totalPaid)}</p>
+                          <div className="overflow-hidden">
+                            <p className="text-[10px] text-gray-400 mb-0.5">Amount Paid</p>
+                            <p className="font-bold text-emerald-600 text-xs truncate">{formatCurrency(c.totalPaid)}</p>
                           </div>
-                          <div>
-                            <p className="text-xs text-gray-400 mb-0.5">Balance</p>
-                            <p className="font-bold text-red-600 text-sm">{formatCurrency(c.remainingBalance)}</p>
+                          <div className="overflow-hidden">
+                            <p className="text-[10px] text-gray-400 mb-0.5">Balance</p>
+                            <p className="font-bold text-red-600 text-xs truncate">{formatCurrency(c.remainingBalance)}</p>
                           </div>
                         </div>
 
