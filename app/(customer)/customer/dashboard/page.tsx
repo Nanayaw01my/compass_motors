@@ -99,30 +99,30 @@ export default async function CustomerDashboard() {
           </div>
         </div>
 
-        {/* Curved bottom */}
-        <div className="absolute bottom-0 left-0 right-0 h-10 rounded-t-[2rem]" style={{ background: "#f4f4f0" }} />
       </div>
 
-      <div className="px-4 -mt-4 pb-28 space-y-4">
+      <div className="px-4 -mt-6 pb-28 space-y-4">
 
         {/* ── Quick Actions ── */}
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { href: "/customer/payments", icon: CreditCard, label: "Payments", color: "#b91c1c", bg: "#fef2f2" },
-            { href: "/customer/history", icon: Clock, label: "History", color: "#1d4ed8", bg: "#eff6ff" },
-            { href: "tel:0593920144", icon: Phone, label: "Call Us", color: "#065f46", bg: "#ecfdf5" },
-          ].map(({ href, icon: Icon, label, color, bg }) => (
-            <a
-              key={label}
-              href={href}
-              className="rounded-2xl p-4 flex flex-col items-center gap-2.5 bg-white border border-black/[0.05] shadow-sm active:scale-[0.97] transition-transform"
-            >
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: bg }}>
-                <Icon className="w-5 h-5" style={{ color }} />
-              </div>
-              <span className="text-xs font-semibold text-gray-700">{label}</span>
-            </a>
-          ))}
+        <div className="bg-white rounded-2xl shadow-lg border border-black/[0.05] overflow-hidden">
+          <div className="grid grid-cols-3 divide-x divide-gray-100">
+            {[
+              { href: "/customer/payments", icon: CreditCard, label: "Payments", color: "#b91c1c", bg: "#fef2f2" },
+              { href: "/customer/history", icon: Clock, label: "History", color: "#1d4ed8", bg: "#eff6ff" },
+              { href: "tel:0593920144", icon: Phone, label: "Call Us", color: "#065f46", bg: "#ecfdf5" },
+            ].map(({ href, icon: Icon, label, color, bg }) => (
+              <a
+                key={label}
+                href={href}
+                className="flex flex-col items-center gap-2 py-5 active:bg-gray-50 transition-colors"
+              >
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: bg }}>
+                  <Icon className="w-5 h-5" style={{ color }} />
+                </div>
+                <span className="text-xs font-bold text-gray-700">{label}</span>
+              </a>
+            ))}
+          </div>
         </div>
 
         {/* ── No Contract ── */}
