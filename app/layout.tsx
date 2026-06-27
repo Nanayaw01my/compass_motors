@@ -13,6 +13,10 @@ export const metadata: Metadata = {
   description: "Motorcycle installment and work-and-pay management platform for Compass Motors Ghana.",
   manifest: "/manifest.json",
   metadataBase: new URL("https://www.compassmotors.online"),
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    shortcut: "/favicon.svg",
+  },
   openGraph: {
     title: "Compass Motors",
     description: "Motorcycle installment and work-and-pay management platform",
