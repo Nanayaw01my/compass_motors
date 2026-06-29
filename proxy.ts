@@ -7,6 +7,15 @@ export const proxy = auth(function proxy(req: NextRequest & { auth: any }) {
   const session = req.auth;
   const role = session?.user ? (session.user as any).role : null;
 
+  // Maintenance mode — redirect everyone except admins to /maintenance
+  if (
+    process.env.MAINTENANCE_MODE === "true" &&
+    pathname !== "/maintenance" &&
+    role !== "admin"
+  ) {
+    return NextResponse.redirect(new URL("/maintenance", req.url));
+  }
+
   // Admin routes — must be logged in as admin
   if (pathname.startsWith("/admin")) {
     if (!session) {
@@ -41,5 +50,5 @@ export const proxy = auth(function proxy(req: NextRequest & { auth: any }) {
 });
 
 export const config = {
-  matcher: ["/admin/:path*", "/customer/:path*", "/login"],
+  matcher: ["/((?!_next/static|_next/image|favicon|icon|manifest|robots\\.txt).*)"],
 };
