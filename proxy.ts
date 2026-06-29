@@ -7,11 +7,10 @@ export const proxy = auth(function proxy(req: NextRequest & { auth: any }) {
   const session = req.auth;
   const role = session?.user ? (session.user as any).role : null;
 
-  // Maintenance mode — redirect everyone except admins to /maintenance
+  // Maintenance mode — redirect everyone to /maintenance
   if (
     process.env.MAINTENANCE_MODE === "true" &&
-    pathname !== "/maintenance" &&
-    role !== "admin"
+    pathname !== "/maintenance"
   ) {
     return NextResponse.redirect(new URL("/maintenance", req.url));
   }
